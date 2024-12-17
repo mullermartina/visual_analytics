@@ -125,9 +125,7 @@ df_chart.sort_values('nota_real')
 # ==================================================================
 # Barra Lateral no Streamlit 
 # ==================================================================
-st.sidebar.markdown( '# ToEat Restaurants' ) 
-st.sidebar.markdown( """---""" ) # Assim eu crio uma linha
-st.sidebar.markdown( '# Filtro' )
+st.sidebar.markdown( '## Filtro' )
 
 lista_notas = list(df_chart['nota_real'].unique())
 opcao_notas = st.sidebar.multiselect(
@@ -187,6 +185,7 @@ with st.container():
 
     # Show the figure
     fig.show()
+    st.plotly_chart( fig )
 
 with st.container():
     st.markdown( """---""" )
@@ -253,6 +252,7 @@ with st.container():
 
     # Show the figure
     fig.show()
+    st.plotly_chart( fig )
 
               
 with st.container():
@@ -318,5 +318,6 @@ with st.container():
 
     # Show the figure
     fig.show()
+    st.plotly_chart( fig )
 
 

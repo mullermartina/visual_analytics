@@ -117,9 +117,7 @@ df_words_5 = df_words_sorted.loc[df_words_sorted['nota'] == 5, :]
 # ==================================================================
 # Barra Lateral no Streamlit 
 # ==================================================================
-st.sidebar.markdown( '# ToEat Restaurants' ) 
-st.sidebar.markdown( """---""" ) # Assim eu crio uma linha ACHO Q O FILTRO NAO VAI FUNCIONAR VISTO Q FIZ 5 DFS DIFERENTES.
-st.sidebar.markdown( '# Filtro' )
+st.sidebar.markdown( '## Filtro' )
 
 lista_notas = list(df_words_sorted['nota'].unique())
 opcao_notas = st.sidebar.multiselect(
@@ -173,6 +171,7 @@ with st.container():
 
         # Show the figure
         fig.show()
+        st.plotly_chart( fig )
 
     with col2:
 
@@ -192,6 +191,7 @@ with st.container():
                 "Frequência: %{z}<extra></extra>"
             )
         ))
+        st.plotly_chart( fig )
 
         # Update layout for better visualization
         fig.update_layout(
@@ -208,6 +208,7 @@ with st.container():
 
         # Show the figure
         fig.show()
+        st.plotly_chart( fig )
 
 
     with col3:
@@ -244,7 +245,7 @@ with st.container():
 
         # Show the figure
         fig.show()
-
+        st.plotly_chart( fig )
 
     with col4:
 
@@ -315,6 +316,7 @@ with st.container():
 
         # Show the figure
         fig.show()
+        st.plotly_chart( fig )
 
     with col6:
         # Pivot the data for heatmap
@@ -349,3 +351,4 @@ with st.container():
 
         # Show the figure
         fig.show()
+        st.plotly_chart( fig )
