@@ -139,7 +139,7 @@ df_chart = df_chart.loc[nota_selec, :]
 # ==================================================================
 # Layout no Streamlit
 # ==================================================================
-st.header( 'Celpe-Bras 2015/2 Tarefa 4' )
+st.header( 'Tokens e Types' )
 
 with st.container():
     st.markdown( """---""" )
