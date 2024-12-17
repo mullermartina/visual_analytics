@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import nltk
-import seaborn as sns
-#import matplotlib.pyplot as plt
 from collections import Counter #uso para n-gramas
 import re # talvez regex vai ajudar na normalizaçao
 import plotly.graph_objects as go
@@ -11,13 +9,13 @@ import streamlit as st
 # ==================================================================
 # Configurações da Página 
 # ==================================================================
-st.set_page_config(page_title = 'Freqência das Palavras',
+st.set_page_config(page_title = 'Frequência das Palavras',
                   layout= 'centered')
 
 # ==================================================================
 #Import dataset
 # ==================================================================
-csv_file_path = 'C:/Users/Administrator/Documents/repos/mestrado/visual_analytics/corpus_completo.csv'
+csv_file_path = 'corpus_completo.csv'
 
 # Lendo o csv como um df
 df = pd.read_csv(csv_file_path)

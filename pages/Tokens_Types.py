@@ -16,7 +16,7 @@ st.set_page_config(page_title = 'Tokens e Types',
 # ==================================================================
 #Import dataset
 # ==================================================================
-csv_file_path = 'C:/Users/Administrator/Documents/repos/mestrado/visual_analytics/corpus_completo.csv'
+csv_file_path = 'corpus_completo.csv'
 
 # Lendo o csv como um df
 df = pd.read_csv(csv_file_path)
