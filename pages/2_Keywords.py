@@ -134,8 +134,8 @@ df_words_sorted = df_words_sorted.loc[nota_selec, :]
 st.header( 'Frequência das palavras' )
 
 with st.container():
-    st.subheader( 'Heatmap para notas 0, 1 e 2' )
-    col1, col2, col3 = st.columns( 3,  gap='small' )
+    st.subheader( 'Heatmap para notas 0 e 1' )
+    col1, col2 = st.columns( 2,  gap='small' )
 
     with col1:
 
@@ -191,7 +191,6 @@ with st.container():
                 "Frequência: %{z}<extra></extra>"
             )
         ))
-        st.plotly_chart( fig )
 
         # Update layout for better visualization
         fig.update_layout(
@@ -210,8 +209,10 @@ with st.container():
         fig.show()
         st.plotly_chart( fig )
 
-
-    with col3:
+with st.container():
+    st.subheader( 'Heatmap para notas 2 e 3' )
+    col1, col2 = st.columns( 2,  gap='small' )
+    with col1:
 
         # Pivot the data for heatmap
         heatmap_data = df_words_2.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
@@ -247,10 +248,7 @@ with st.container():
         fig.show()
         st.plotly_chart( fig )
 
-with st.container():
-    st.subheader( 'Heatmap para notas 3, 4 e 5' )
-    col1, col2, col3 = st.columns( 3,  gap='small' )
-    with col1:
+    with col2:
 
         # Pivot the data for heatmap
         heatmap_data = df_words_3.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
@@ -284,8 +282,13 @@ with st.container():
 
         # Show the figure
         fig.show()
+        st.plotly_chart( fig )
 
-    with col2:
+with st.container():
+    st.subheader( 'Heatmap para notas 4 e 5' )
+    col1, col2= st.columns( 2,  gap='small' )
+
+    with col1:
 
         # Pivot the data for heatmap
         heatmap_data = df_words_4.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
@@ -321,7 +324,7 @@ with st.container():
         fig.show()
         st.plotly_chart( fig )
 
-    with col3:
+    with col2:
         # Pivot the data for heatmap
         heatmap_data = df_words_5.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
 
