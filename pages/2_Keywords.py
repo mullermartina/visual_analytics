@@ -134,8 +134,8 @@ df_words_sorted = df_words_sorted.loc[nota_selec, :]
 st.header( 'Frequência das palavras' )
 
 with st.container():
-    st.subheader( 'Heatmap para cada nota' )
-    col1, col2, col3 = st.columns( 3,  gap='large' )
+    st.subheader( 'Heatmap para notas 0, 1 e 2' )
+    col1, col2, col3 = st.columns( 3,  gap='small' )
 
     with col1:
 
@@ -248,8 +248,8 @@ with st.container():
         st.plotly_chart( fig )
 
 with st.container():
-    st.subheader( 'Heatmap para cada nota' )
-    col1, col2, col3 = st.columns( 3,  gap='large' )
+    st.subheader( 'Heatmap para notas 3, 4 e 5' )
+    col1, col2, col3 = st.columns( 3,  gap='small' )
     with col1:
 
         # Pivot the data for heatmap
