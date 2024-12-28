@@ -127,14 +127,14 @@ df_chart.sort_values('nota_real')
 # ==================================================================
 st.sidebar.markdown( '## Filtro' )
 
-lista_notas = list(df_chart['nota_real'].unique())
-opcao_notas = st.sidebar.multiselect(
-    'Escolha a nota que deseja visualizar',
-    lista_notas,
-    default = [0, 1, 2, 3, 4, 5] #nao sei se fiz certo...
+# Sidebar filter for grade
+selected_grades = st.sidebar.multiselect(
+    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
 )
-nota_selec = df_chart['nota_real'].isin(opcao_notas)
-df_chart = df_chart.loc[nota_selec, :]
+
+# Filter DataFrames based on selected grades
+filtered_df_chart = df_chart[df_chart['nota_real'].isin(selected_grades)]
+filtered_df_va = df_va[df_va['nota'].isin(selected_grades)]
 
 # ==================================================================
 # Layout no Streamlit
@@ -177,7 +177,7 @@ with st.container():
         color="white"    # White font for y-axis labels
         ),
         hoverlabel=dict(
-        bgcolor="#FFE6E6",  # Light red background
+        bgcolor="#FFFFFF",  # Light red background
         font_size=14,       # Tooltip font size
         font_color="black"  # Tooltip text color
         )
@@ -215,7 +215,7 @@ with st.container():
         x=df_chart['nota_real'], 
         y=df_chart['qtde_tokens_min'], 
         name='Mínimo de tokens', 
-        marker_color='#FF6666',  # Slightly lighter red
+        marker_color='#FF904B',  # Nova cor: laranja
         hovertemplate=(
             "Mínimo de tokens: %{y}<br>" +
             "Número médio: %{customdata[0]:.2f}<br>" +
@@ -244,7 +244,7 @@ with st.container():
             color="white"    # White font for y-axis labels
         ),
         hoverlabel=dict(
-            bgcolor="#FFE6E6",  # Light red background for tooltip
+            bgcolor="#FFFFFF",  # Light red background for tooltip
             font_size=12,       # Tooltip font size
             font_color="black"  # Tooltip text color
         )
@@ -280,7 +280,7 @@ with st.container():
         x=df_chart['nota_real'], 
         y=df_chart['qtde_media_types'], 
         name='Média de types', 
-        marker_color='#FF6666',  # Slightly lighter red
+        marker_color='#FF904B',  # Nova cor: laranja
         hovertemplate=(
             "Média de types: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
@@ -309,7 +309,7 @@ with st.container():
             color="white"    # White font for y-axis labels
         ),
         hoverlabel=dict(
-            bgcolor="#FFE6E6",  # Light red background for tooltip
+            bgcolor="#FFFFFF",  # Light red background for tooltip
             font_size=12,       # Tooltip font size
             font_color="black"  # Tooltip text color
         )
@@ -320,4 +320,46 @@ with st.container():
     fig.show()
     st.plotly_chart( fig )
 
+with st.container():
+    st.markdown( """---""" )
+    st.subheader( 'Número de Tokens e Types de Cada Texto Segundo Cada Nota' )
+
+    # Create the scatterplot
+    fig = px.scatter(
+        df_va,
+        x='token_count',                # x-axis: total tokens
+        y='types_count',                # y-axis: unique tokens
+        color='nota',                   # Color the dots based on the 'nota' column
+        hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota'
+        title="Quantidade de Tokens e Types segundo Nota",
+        labels={
+            'token_count': 'Tokens',
+            'types_count': 'Types',
+            'nota': 'Nota'
+        },
+        color_continuous_scale='Agsunset' 
+    )
+
+    # Customize layout
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+        plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot area
+        font=dict(color='white'),       # White font for titles, labels, and text
+        title_font=dict(size=18),       # Title font size
+        xaxis_title_font=dict(size=14), # X-axis label font size
+        yaxis_title_font=dict(size=14), # Y-axis label font size
+    )
+
+    # Customize tooltip
+    fig.update_traces(
+        hoverlabel=dict(
+            bgcolor='white',            # White background for tooltip
+            font_size=12,               # Font size for tooltip text
+            font_color='black'          # Black font color
+        )
+    )
+
+    # Show the figure
+    fig.show()
+    st.plotly_chart( fig )
 
