@@ -147,7 +147,7 @@ with st.container():
 
     # Create the bar chart
     fig = px.bar(
-      df_chart,  # Pass the entire DataFrame
+      filtered_df_chart,  # Pass the entire DataFrame
       x='nota_real',  # X-axis
       y='qtde_textos',  # Y-axis
       labels={'qtde_textos': 'Quantidade', 'nota_real': 'Nota'},  # Custom axis labels
@@ -191,15 +191,15 @@ with st.container():
     st.markdown( """---""" )
     st.subheader( 'Número Máximo e Mínimo de Tokens ')
     
-    customdata = df_chart[['qtde_media_tokens', 'desvpad_qtde_tokens']].values
+    customdata = filtered_df_chart[['qtde_media_tokens', 'desvpad_qtde_tokens']].values
 
     # Create the figure
     fig = go.Figure()
 
     # Add the bars for max tokens
     fig.add_trace(go.Bar(
-        x=df_chart['nota_real'], 
-        y=df_chart['qtde_tokens_max'], 
+        x=filtered_df_chart['nota_real'], 
+        y=filtered_df_chart['qtde_tokens_max'], 
         name='Máximo de tokens', 
         marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
@@ -212,8 +212,8 @@ with st.container():
 
     # Add the bars for min tokens
     fig.add_trace(go.Bar(
-        x=df_chart['nota_real'], 
-        y=df_chart['qtde_tokens_min'], 
+        x=filtered_df_chart['nota_real'], 
+        y=filtered_df_chart['qtde_tokens_min'], 
         name='Mínimo de tokens', 
         marker_color='#FF904B',  # Nova cor: laranja
         hovertemplate=(
@@ -264,28 +264,28 @@ with st.container():
 
     # Add the bars for avg tokens
     fig.add_trace(go.Bar(
-        x=df_chart['nota_real'], 
-        y=df_chart['qtde_media_tokens'], 
+        x=filtered_df_chart['nota_real'], 
+        y=filtered_df_chart['qtde_media_tokens'], 
         name='Média de tokens', 
         marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
             "Média de tokens: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
         ),
-        customdata=df_chart['TTR']
+        customdata=filtered_df_chart['TTR']
     ))
 
     # Add the bars for avg types
     fig.add_trace(go.Bar(
-        x=df_chart['nota_real'], 
-        y=df_chart['qtde_media_types'], 
+        x=filtered_df_chart['nota_real'], 
+        y=filtered_df_chart['qtde_media_types'], 
         name='Média de types', 
         marker_color='#FF904B',  # Nova cor: laranja
         hovertemplate=(
             "Média de types: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
         ),
-        customdata=df_chart['TTR']
+        customdata=filtered_df_chart['TTR']
 
     ))
 
@@ -326,12 +326,12 @@ with st.container():
 
     # Create the scatterplot
     fig = px.scatter(
-        df_va,
+        filtered_df_va,
         x='token_count',                # x-axis: total tokens
         y='types_count',                # y-axis: unique tokens
         color='nota',                   # Color the dots based on the 'nota' column
         hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota'
-        title="Quantidade de Tokens e Types segundo Nota",
+        #title="Quantidade de Tokens e Types segundo Nota",
         labels={
             'token_count': 'Tokens',
             'types_count': 'Types',

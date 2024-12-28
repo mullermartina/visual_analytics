@@ -9,8 +9,8 @@ st.set_page_config(page_title = 'Home',
 # ==================================================================
 # Barra Lateral
 # ==================================================================
-st.sidebar.markdown( '# Celpe-Bras 2015/2' ) 
-st.sidebar.markdown( """---""" )
+#st.sidebar.markdown( '# Celpe-Bras 2015/2' ) 
+#st.sidebar.markdown( """---""" )
 
 # ==================================================================
 # Layout
@@ -39,6 +39,4 @@ st.markdown("""
 """
 )
 
-st.markdown('')
-st.markdown('')
-st.markdown('Dados não estão publicamente disponíveis')
+st.markdown('Dados não estão publicamente disponíveis.')
