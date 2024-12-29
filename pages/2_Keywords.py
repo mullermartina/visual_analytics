@@ -93,7 +93,6 @@ df_words = pd.DataFrame()
 # Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota
 top_tokens_per_grade = (
     sorted_tokens.groupby('nota') #aqui q tinha o head, antes do reset_index
-    .reset_index(drop=True)
 )
 
 df_words = top_tokens_per_grade
