@@ -178,7 +178,7 @@ with st.container():
         ),
         hoverlabel=dict(
         bgcolor="#FFFFFF",  # Light red background
-        font_size=14,       # Tooltip font size
+        font_size=16,       # Tooltip font size      TROQUEI TAMANHO DA FONTE AQUI
         font_color="black"  # Tooltip text color
         )
     )
@@ -245,7 +245,7 @@ with st.container():
         ),
         hoverlabel=dict(
             bgcolor="#FFFFFF",  # Light red background for tooltip
-            font_size=12,       # Tooltip font size
+            font_size=14,       # Tooltip font size        TROQUEI TAMANHO DA FONTE AQUI
             font_color="black"  # Tooltip text color
         )
     )
@@ -267,7 +267,7 @@ with st.container():
         x=filtered_df_chart['nota_real'], 
         y=filtered_df_chart['qtde_media_tokens'], 
         name='Média de tokens', 
-        marker_color='#FF4B4B',  # Streamlit-like red
+        marker_color='#FF4B4B',  # Vermelho do Streamlit
         hovertemplate=(
             "Média de tokens: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
@@ -310,7 +310,7 @@ with st.container():
         ),
         hoverlabel=dict(
             bgcolor="#FFFFFF",  # Light red background for tooltip
-            font_size=12,       # Tooltip font size
+            font_size=14,       # Tooltip font size           TROQUEI TAMANHO DA FONTE AQUI
             font_color="black"  # Tooltip text color
         )
 
@@ -330,8 +330,7 @@ with st.container():
         x='token_count',                # x-axis: total tokens
         y='types_count',                # y-axis: unique tokens
         color='nota',                   # Color the dots based on the 'nota' column
-        hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota'
-        #title="Quantidade de Tokens e Types segundo Nota",
+        hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota' #title="Quantidade de Tokens e Types segundo Nota", TA APARECENDO UNDEFINED... COMO TIRAAAAR
         labels={
             'token_count': 'Tokens',
             'types_count': 'Types',
@@ -345,16 +344,16 @@ with st.container():
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
         plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot area
         font=dict(color='white'),       # White font for titles, labels, and text
-        title_font=dict(size=18),       # Title font size
-        xaxis_title_font=dict(size=14), # X-axis label font size
-        yaxis_title_font=dict(size=14), # Y-axis label font size
+        #title_font=dict(size=18),       # Title font size
+        xaxis_title_font=dict(size=16), # X-axis label font size            TROQUEI TAMANHO DA FONTE AQUI
+        yaxis_title_font=dict(size=16), # Y-axis label font size               TROQUEI TAMANHO DA FONTE AQUI
     )
 
     # Customize tooltip
     fig.update_traces(
         hoverlabel=dict(
             bgcolor='white',            # White background for tooltip
-            font_size=12,               # Font size for tooltip text
+            font_size=14,               # Font size for tooltip text        TROQUEI TAMANHO DA FONTE AQUI
             font_color='black'          # Black font color
         )
     )

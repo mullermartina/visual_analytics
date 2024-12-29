@@ -35,10 +35,6 @@ nltk.download('punkt_tab') # Precisei que devia fazer download desse pacote pq o
 
 # Pré-processamento
 
-# Devo tirar acentos?? Ex: Belém
-# Retirar números? Na duvida, retirei.
-# Não fiz stemming visto que poderia perder erros ortográficos
-
 #Retirada de sinais gráficos, pontuações e espaços
 def clean_cp(text):
     cleaned = text.lower() #Deixando tudo minúsculo
@@ -49,15 +45,7 @@ def clean_cp(text):
     cleaned = re.sub('\s+', ' ', cleaned)
     return cleaned.strip() # Removendo tabs
 
-#Retirada de stopwords.. Essa parte deve ser importante na hora de ver as palavras mais frequentes (heatmap)
-#def stopwords_cp(text):
-  #  stopwords = nltk.corpus.stopwords.words('portuguese')
-   # tokenized = nltk.word_tokenize(text, language='portuguese')
-   # sem_stopwords = [token for token in tokenized if token not in stopwords]
-   # return ' '.join(sem_stopwords)
-
 df_va['content'] = df_va['content'].apply(clean_cp)
-#df_va['content'] = df_va['content'].apply(stopwords_cp)
 
 # Tokenizando e retirando stopwords: importante para ver a frequencia das palavras
 
@@ -69,7 +57,7 @@ def tokenized_cp(text):
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 
-# Contando o número de tokens SEM STOPWORDS (diferente do typestokenttr.ipynb) para cada texto: usarei isso para o gráfico 2, que demonstra o número mínimo e número máximo de tokens
+# Contando o número de tokens SEM STOPWORDS 
 
 # Contando tokens sem considerar a nota
 df_va['num_tokens'] = df_va['tokenized_content'].apply(len)
@@ -79,10 +67,10 @@ qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
 
 # Verificando a ocorrência dos tokens
 
-# Criando uma lista só com todos os tokens (?)
+# Criando uma lista só com todos os tokens
 all_tokens = [token for tokens in df_va['tokenized_content'] for token in tokens]
 
-# Contando a ocorrencia de cada token
+# Contando a ocorrência de cada token
 token_counts = Counter(all_tokens)
 
 # Agrupando a contagem de tokens de acordo com cada nota
