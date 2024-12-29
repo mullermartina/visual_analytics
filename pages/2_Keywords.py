@@ -39,7 +39,7 @@ def clean_cp(text):
     cleaned = text.lower() #Deixando tudo minúsculo
     cleaned = re.sub('[^\w\s]', '', cleaned) # Removendo pontuacao
     #cleaned = re.sub('[0-9]+', '', cleaned) # Removendo números 
-    cleaned = re.sub('\d+', '', cleaned) # Removendo números NÃO TÁ FUNCIONANDO AAAAAAAAAAAAAAAAA Começou a funcionar qdo pus o lower como primeiro comando da funçao
+    cleaned = re.sub('\d+', '', cleaned) # Removendo números
     cleaned = re.sub('\s+', ' ', cleaned) # Removendo espaços extras
     cleaned = re.sub('\s+', ' ', cleaned)
     return cleaned.strip() # Removendo tabs
@@ -85,27 +85,21 @@ sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
 
 df_words = pd.DataFrame()
 
-# Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota ( 15 * 6 = 90 linhas portanto )
+# Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota
 top_tokens_per_grade = (
     sorted_tokens.groupby('nota')
-    .head(20)  # Select the top 15 tokens per grade
+    .head(20)  # Select the top xx tokens per grade
     .reset_index(drop=True)
 )
+
 df_words = top_tokens_per_grade
 
 df_words_sorted = (df_words.sort_values(by=['nota', 'token_frequency'], ascending=[True, False]))
-df_words_0 = df_words_sorted.loc[df_words_sorted['nota'] == 0, :]
-df_words_1 = df_words_sorted.loc[df_words_sorted['nota'] == 1, :]
-df_words_2 = df_words_sorted.loc[df_words_sorted['nota'] == 2, :]
-df_words_3 = df_words_sorted.loc[df_words_sorted['nota'] == 3, :]
-df_words_4 = df_words_sorted.loc[df_words_sorted['nota'] == 4, :]
-df_words_5 = df_words_sorted.loc[df_words_sorted['nota'] == 5, :]
 
 # ==================================================================
 # Barra Lateral no Streamlit 
 # ==================================================================
 st.sidebar.markdown( '## Filtro' )
-
 
 # Sidebar filter for grade
 selected_grades = st.sidebar.multiselect(
@@ -124,7 +118,7 @@ with st.container():
     st.subheader( 'xx Palavras mais frequentes' )
 
     # Pivot the data for heatmap
-    heatmap_data = df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
+    heatmap_data = filtered_df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
