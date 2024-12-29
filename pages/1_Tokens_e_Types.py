@@ -360,5 +360,5 @@ with st.container():
 
     # Show the figure
     fig.show()
-    st.plotly_chart( fig )
+    st.plotly_chart( fig ) # use_container_width = True pra usar toda largura disponível
 

@@ -135,9 +135,9 @@ with st.container():
         colorbar=dict(title="Frequência", titlefont=dict(size=14), tickfont=dict(size=12)),  # Colorbar title
         hoverongaps=False,       # Ensure no gaps show on hover
         hovertemplate=(
-            "<b>Token</b>: %{y}<br>" + # Token Label
-            "<b>Nota</b>: %{x}<br>" + # Grade label
-            "<b>Frequência</b>: %{z}<extra></extra>" # Frequency label
+            "<span style='font-size:14px'><b>Token</b>: %{y}<br>" +  # Tooltip with larger font
+            "<b>Nota</b>: %{x}<br>" +
+            "<b>Frequência</b>: %{z}</span><extra></extra>"
         )
     ))
 
@@ -152,12 +152,13 @@ with st.container():
     )
 
 
-    fig.update_yaxes(title="", tickfont=dict(size=14), automargin=True)
+    #fig.update_yaxes(title="Tokens", tickfont=dict(size=14), automargin=True)
+    fig.update_yaxes(title="Tokens", showticklabels=False) # showticklabels=False para nao mostrar as palavras à esquerda, somente no tooltip
     fig.update_xaxes(title="", showticklabels=False)
 
     # Show the figure
     fig.show()
-    st.plotly_chart( fig )
+    st.plotly_chart( fig, use_container_width = True )
 
 with st.container():
     st.subheader( 'xx Palavras mais frequentes que não estão no texto de apoio' )
