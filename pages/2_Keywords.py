@@ -56,28 +56,6 @@ def tokenized_cp(text):
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 
-# ==================================================================
-# Barra Lateral no Streamlit 
-# ==================================================================
-st.sidebar.markdown( '## Filtro' )
-
-# Sidebar filter for grade
-selected_grades = st.sidebar.multiselect(
-    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
-)
-
-# Filter Dataframes based on selected grades
-filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
-
-# Filtro para escolher um número x de palavras mais frequentes
-number = st.slider(
-    "Escolha o número de palavras mais frequentes que você deseja exibir",
-    min_value=1,  # Minimum value of the slider
-    max_value=30,  # Maximum value of the slider
-    value=10,  # Default value
-    step=1  # Step size
-)
-
 
 # ==================================================================
 # Processamentos específicos para essa visualização
@@ -114,14 +92,35 @@ df_words = pd.DataFrame()
 
 # Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota
 top_tokens_per_grade = (
-    sorted_tokens.groupby('nota')
-    .head(number)  # Select the top xx tokens per grade
+    sorted_tokens.groupby('nota') #aqui q tinha o head, antes do reset_index
     .reset_index(drop=True)
 )
 
 df_words = top_tokens_per_grade
 
 df_words_sorted = (df_words.sort_values(by=['nota', 'token_frequency'], ascending=[True, False]))
+
+# ==================================================================
+# Barra Lateral no Streamlit 
+# ==================================================================
+st.sidebar.markdown( '## Filtro' )
+
+# Sidebar filter for grade
+selected_grades = st.sidebar.multiselect(
+    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
+)
+
+# Filter Dataframes based on selected grades
+filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
+
+# Filtro para escolher um número x de palavras mais frequentes
+number = st.slider(
+    "Escolha o número de palavras mais frequentes que você deseja exibir",
+    min_value=1,  # Minimum value of the slider
+    max_value=30,  # Maximum value of the slider
+    value=10,  # Default value
+    step=1  # Step size
+)
 
 # ==================================================================
 # Layout no Streamlit
@@ -132,7 +131,7 @@ with st.container():
     st.subheader( 'xx Palavras mais frequentes' )
 
     # Pivot the data for heatmap
-    heatmap_data = filtered_df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
+    heatmap_data = filtered_df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
