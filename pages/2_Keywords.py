@@ -56,6 +56,33 @@ def tokenized_cp(text):
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 
+# ==================================================================
+# Barra Lateral no Streamlit 
+# ==================================================================
+st.sidebar.markdown( '## Filtro' )
+
+# Sidebar filter for grade
+selected_grades = st.sidebar.multiselect(
+    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
+)
+
+# Filter Dataframes based on selected grades
+filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
+
+# Filtro para escolher um número x de palavras mais frequentes
+number = st.slider(
+    "Escolha o número de palavras mais frequentes que você deseja exibir",
+    min_value=1,  # Minimum value of the slider
+    max_value=30,  # Maximum value of the slider
+    value=10,  # Default value
+    step=1  # Step size
+)
+
+
+# ==================================================================
+# Processamentos específicos para essa visualização
+# ==================================================================
+
 # Contando o número de tokens SEM STOPWORDS 
 
 # Contando tokens sem considerar a nota
@@ -88,26 +115,13 @@ df_words = pd.DataFrame()
 # Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota
 top_tokens_per_grade = (
     sorted_tokens.groupby('nota')
-    .head(20)  # Select the top xx tokens per grade
+    .head(number)  # Select the top xx tokens per grade
     .reset_index(drop=True)
 )
 
 df_words = top_tokens_per_grade
 
 df_words_sorted = (df_words.sort_values(by=['nota', 'token_frequency'], ascending=[True, False]))
-
-# ==================================================================
-# Barra Lateral no Streamlit 
-# ==================================================================
-st.sidebar.markdown( '## Filtro' )
-
-# Sidebar filter for grade
-selected_grades = st.sidebar.multiselect(
-    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
-)
-
-# Filter Dataframes based on selected grades
-filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
 
 # ==================================================================
 # Layout no Streamlit
