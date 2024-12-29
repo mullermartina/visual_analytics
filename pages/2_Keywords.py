@@ -86,18 +86,18 @@ nota_token_counts = (
 # Convertendo cada token e contagem em um dataframe
 df_frequency = nota_token_counts.reset_index()
 df_frequency.columns = ['nota', 'token', 'token_frequency']
-sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
+#sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
 
-df_words = pd.DataFrame()
+#df_words = pd.DataFrame()
 
 # Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota
-top_tokens_per_grade = (
-    sorted_tokens.groupby('nota') #aqui q tinha o head, antes do reset_index
-)
+#top_tokens_per_grade = (
+  #  sorted_tokens.groupby('nota') #aqui q tinha o head, antes do reset_index
+#)
 
-df_words = top_tokens_per_grade
+#df_words = top_tokens_per_grade
 
-df_words_sorted = (df_words.sort_values(by=['nota', 'token_frequency'], ascending=[True, False]))
+#df_words_sorted = (df_words.sort_values(by=['nota', 'token_frequency'], ascending=[True, False]))
 
 # ==================================================================
 # Barra Lateral no Streamlit 
@@ -110,7 +110,7 @@ selected_grades = st.sidebar.multiselect(
 )
 
 # Filter Dataframes based on selected grades
-filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
+filtered_df_frequency = df_frequency[df_frequency['nota'].isin(selected_grades)]
 
 # Filtro para escolher um número x de palavras mais frequentes
 number = st.slider(
@@ -130,7 +130,7 @@ with st.container():
     st.subheader( 'xx Palavras mais frequentes' )
 
     # Pivot the data for heatmap
-    heatmap_data = filtered_df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
+    heatmap_data = filtered_df_frequency.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
