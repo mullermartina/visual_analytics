@@ -30,8 +30,7 @@ df_va.groupby('nota').count()
 
 nltk.download('stopwords')
 nltk.download('punkt') # é um tokenizador, importante para nltk.word_tokenize
-# nltk.download('rslp') é um stemmer. acho q nao vou usar
-nltk.download('punkt_tab') # Precisei que devia fazer download desse pacote pq o punkt nao tava funcionando
+nltk.download('punkt_tab') # download desse pacote pq o punkt sozinho nao tava funcionando
 
 # Pré-processamento
 
@@ -107,14 +106,14 @@ df_words_5 = df_words_sorted.loc[df_words_sorted['nota'] == 5, :]
 # ==================================================================
 st.sidebar.markdown( '## Filtro' )
 
-lista_notas = list(df_words_sorted['nota'].unique())
-opcao_notas = st.sidebar.multiselect(
-    'Escolha a nota que deseja visualizar',
-    lista_notas,
-    default = [0, 1, 2, 3, 4, 5] #nao sei se fiz certo...
+
+# Sidebar filter for grade
+selected_grades = st.sidebar.multiselect(
+    "Escolha a nota que deseja visualizar", [0, 1, 2, 3, 4, 5], default=[0, 1, 2, 3, 4, 5]
 )
-nota_selec = df_words_sorted['nota'].isin(opcao_notas)
-df_words_sorted = df_words_sorted.loc[nota_selec, :]
+
+# Filter Dataframes based on selected grades
+filtered_df_words_sorted = df_words_sorted[df_words_sorted['nota'].isin(selected_grades)]
 
 # ==================================================================
 # Layout no Streamlit
@@ -122,227 +121,43 @@ df_words_sorted = df_words_sorted.loc[nota_selec, :]
 st.header( 'Frequência das palavras' )
 
 with st.container():
-    st.subheader( 'Heatmap para notas 0 e 1' )
-    col1, col2 = st.columns( 2,  gap='small' )
+    st.subheader( 'xx Palavras mais frequentes' )
 
-    with col1:
+    # Pivot the data for heatmap
+    heatmap_data = df_words_sorted.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
 
-        # Pivot the data for heatmap
-        heatmap_data = df_words_0.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-        # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-            width=300,  # Adjust width for each heatmap ....  * len(grades)
-            template="plotly_white",
-            plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-            paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-            font=dict(color="white")  # White font for all text
+    # Create the heatmap
+    fig = go.Figure(data=go.Heatmap(
+        z=heatmap_data.values,  # Frequency matrix
+        x=heatmap_data.columns,  # Grades (x-axis)
+        y=heatmap_data.index,    # Tokens (y-axis)
+        colorscale='Reds',       # Heatmap color scale
+        colorbar=dict(title="Frequência", titlefont=dict(size=14), tickfont=dict(size=12)),  # Colorbar title
+        hoverongaps=False,       # Ensure no gaps show on hover
+        hovertemplate=(
+            "<b>Token</b>: %{y}<br>" + # Token Label
+            "<b>Nota</b>: %{x}<br>" + # Grade label
+            "<b>Frequência</b>: %{z}<extra></extra>" # Frequency label
         )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
+    ))
 
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
-
-    with col2:
-
-        # Pivot the data for heatmap
-        heatmap_data = df_words_1.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-        # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-            width=300,  # Adjust width for each heatmap ....  * len(grades)
-            template="plotly_white",
-            plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-            paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-            font=dict(color="white")  # White font for all text
-        )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
-
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
-
-with st.container():
-    st.subheader( 'Heatmap para notas 2 e 3' )
-    col1, col2 = st.columns( 2,  gap='small' )
-    with col1:
-
-        # Pivot the data for heatmap
-        heatmap_data = df_words_2.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-        # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-            width=300,  # Adjust width for each heatmap ....  * len(grades)
-            template="plotly_white",
-            plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-            paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-            font=dict(color="white")  # White font for all text
-        )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
-
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
-
-    with col2:
-
-        # Pivot the data for heatmap
-        heatmap_data = df_words_3.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-            # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-        width=300,  # Adjust width for each heatmap ....  * len(grades)
+    # Update layout for better visualization
+    fig.update_layout(
         template="plotly_white",
         plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
         paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-        font=dict(color="white")  # White font for all text
-        )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
+        font=dict(color="white", size=14),  # White font for all text
+        height=800, # Increase height for better visualization
+        width=1000
+    )
 
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
+
+    fig.update_yaxes(title="", tickfont=dict(size=14), automargin=True)
+    fig.update_xaxes(title="", showticklabels=False)
+
+    # Show the figure
+    fig.show()
+    st.plotly_chart( fig )
 
 with st.container():
-    st.subheader( 'Heatmap para notas 4 e 5' )
-    col1, col2= st.columns( 2,  gap='small' )
-
-    with col1:
-
-        # Pivot the data for heatmap
-        heatmap_data = df_words_4.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-            # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-            width=300,  # Adjust width for each heatmap ....  * len(grades)
-            template="plotly_white",
-            plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-            paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-            font=dict(color="white")  # White font for all text
-        )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
-
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
-
-    with col2:
-        # Pivot the data for heatmap
-        heatmap_data = df_words_5.pivot(index='token', columns='nota', values='token_frequency').fillna(0)
-
-        # Create the heatmap
-        fig = go.Figure(data=go.Heatmap(
-            z=heatmap_data.values,  # Frequency matrix
-            x=heatmap_data.columns,  # Grades (x-axis)
-            y=heatmap_data.index,    # Tokens (y-axis)
-            colorscale='Reds',       # Heatmap color scale
-            #colorbar=dict(title="Frequência"),  # Colorbar title
-            hoverongaps=False,       # Ensure no gaps show on hover
-            hovertemplate=(
-                "Token: %{y}<br>" + #Exibir título pelo Streamlit, q aí fica título pra cada coluna
-                "Frequência: %{z}<extra></extra>"
-            )
-        ))
-
-        # Update layout for better visualization
-        fig.update_layout(
-            # title="20 Tokens Mais Frequentes", >> Por título no streamlit
-            height=500,  # Adjust height to make the heatmaps narrow
-            width=300,  # Adjust width for each heatmap ....  * len(grades)
-            template="plotly_white",
-            plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-            paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-            font=dict(color="white")  # White font for all text
-        )
-        #fig.update_yaxes(title="Tokens", automargin=True)
-        fig.update_xaxes(title="", showticklabels=False)
-
-        # Show the figure
-        fig.show()
-        st.plotly_chart( fig )
+    st.subheader( 'xx Palavras mais frequentes que não estão no texto de apoio' )
