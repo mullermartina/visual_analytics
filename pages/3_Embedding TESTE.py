@@ -145,4 +145,3 @@ with st.container():
         fig = visualize_embeddings(model)
 
     st.plotly_chart(fig, use_container_width=True)
-
