@@ -154,7 +154,7 @@ df_words_ta = top_tokens_per_grade
 # ==================================================================
 # Barra Lateral no Streamlit 
 # ==================================================================
-st.sidebar.markdown( '## Filtro' )
+st.sidebar.markdown( '## Filtros' )
 
 # Sidebar filter for grade
 selected_grades = st.sidebar.multiselect(
@@ -163,6 +163,8 @@ selected_grades = st.sidebar.multiselect(
 
 # Filter Dataframes based on selected grades
 filtered_df_words = df_words[df_words['nota'].isin(selected_grades)]
+
+st.markdown("")
 
 # Filtro para escolher um número x de palavras mais frequentes
 number = st.sidebar.slider(
