@@ -181,7 +181,8 @@ number = st.sidebar.slider(
 st.header( 'Frequência das palavras' )
 
 with st.container():
-    st.subheader( 'xx Palavras mais frequentes' )
+    st.markdown( """---""" )
+    st.subheader(f'{number} Palavras mais frequentes')
 
     # Pivot the data for heatmap
     heatmap_data = filtered_df_words.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
@@ -207,7 +208,7 @@ with st.container():
         plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
         paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
         font=dict(color="white", size=14),  # White font for all text
-        height=800, # Increase height for better visualization
+        height=600, # Increase height for better visualization
         width=1000
     )
 
@@ -221,7 +222,7 @@ with st.container():
     st.plotly_chart( fig, use_container_width = True )
 
 with st.container():
-    st.subheader( 'xx Palavras mais frequentes que não estão no texto de apoio' )
+    st.subheader(f'{number} Palavras mais frequentes que não estão no enunciado ou no texto de apoio')
 
     # Pivot the data for heatmap
     heatmap_data = df_words_ta.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
@@ -247,7 +248,7 @@ with st.container():
         plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
         paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
         font=dict(color="white", size=14),  # Update general font size
-        height=800,  # Adjust height
+        height=600,  # Adjust height
         width=1000,   # Keep width consistent
     )
 
