@@ -26,7 +26,7 @@ df_va = df.copy()
 # ==================================================================
 # Pré-Processamento
 # ==================================================================
-df_va.groupby('nota').count()
+df_va.groupby('nota').count() # ACXHO Q NAO PRECISO DESSA LINHA MAS NAO CHEGUEI A TESTAR SEM ELA !!
 
 nltk.download('stopwords')
 nltk.download('punkt') # é um tokenizador, importante para nltk.word_tokenize
