@@ -135,13 +135,21 @@ with st.container():
         return fig
 
     # Streamlit UI
-    word_list = list(model.wv.index_to_key)  # Full list of vocabulary
-    selected_word = st.selectbox('Escolha uma palavra para visualizar:', word_list)
+    visualization_choice = st.radio(
+        "Você quer visualizar todas as palavras ou apenas uma palavra específica e seus vizinhos?",
+        options=["Visualizar todas as palavras", "Visualizar uma palavra específica e seus vizinhos"]
+    )
 
-    if selected_word:
-        st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos.')
-        fig = visualize_embeddings(model, selected_word)
-    else:
+    if visualization_choice == "Visualizar todas as palavras":
+        st.write("Visualizando todas as palavras.")
         fig = visualize_embeddings(model)
+    else:
+        word_list = list(model.wv.index_to_key)  # Full list of vocabulary
+        selected_word = st.selectbox('Escolha uma palavra para visualizar:', word_list)
+        if selected_word:
+            st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos.')
+            fig = visualize_embeddings(model, selected_word)
+        else:
+            st.write("Por favor, escolha uma palavra para visualizar.")
 
     st.plotly_chart(fig, use_container_width=True)
