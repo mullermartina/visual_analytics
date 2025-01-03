@@ -68,7 +68,8 @@ model = Word2Vec( # Se ficar pesado, inserir no streamlit somente o modelo trein
     window=5,                   # Context window size
     min_count=1,                # Minimum word frequency
     sg=0,                       # CBOW (0) or Skip-gram (1)
-    workers=4                   # Number of worker threads
+    workers=1,                  # workers=1 to eliminate ordering jitter from OS thread scheduling. To do a reproducible run
+    seed=42                     # To do a reproducible run
 )
 
 # ==================================================================
@@ -80,108 +81,7 @@ with st.container():
     st.markdown("""---""")
     st.subheader('Embedding das Palavras do Corpus')
 
-    # TSNE visualization function
-    #def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
-     #   words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
-      #  vectors = model.wv[words]
-
-      #  tsne = TSNE(n_components=2, random_state=42, perplexity=30)
-      #  reduced_vectors = tsne.fit_transform(vectors)
-
-      #  df_fe = pd.DataFrame({
-        #    'Token': words,
-        #    'x': reduced_vectors[:, 0],
-         #   'y': reduced_vectors[:, 1]
-       # })
-
-      #  if selected_word:
-       #     # Find the neighbors of the selected word
-        #    neighbors = model.wv.most_similar(selected_word, topn=num_neighbors)
-          #  neighbor_words = [selected_word] + [word for word, _ in neighbors]
-          #  df_filtered = df_fe[df_fe['Token'].isin(neighbor_words)]
-         #   highlight_color = '#FF4B4B'  # Red for selected word
-          #  df_fe['color'] = df_fe['Token'].apply(
-            #    lambda x: highlight_color if x == selected_word else '#FF4B4B'
-            #)
-           # df_filtered['color'] = df_filtered['Token'].apply(
-           #     lambda x: highlight_color if x == selected_word else '#FF4B4B'
-           # )
-       # else:
-         #   df_filtered = df_fe
-         #   df_fe['color'] = '#FF904B' # Orange
-
-      #  fig = px.scatter(
-        #    df_filtered, x='x', y='y', text='Token',
-        #    labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'},
-         #   color=df_filtered['color']
-       # )
-       # fig.update_traces(
-        #    textposition='top center',
-         #   marker=dict(size=14),  # Adjust marker size
-          #  textfont=dict(color='white')  # White words
-       # )
-       # fig.update_layout(
-          #  plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
-          #  paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
-          #  font=dict(color='white'),  # White font for axis labels and title
-          #  hoverlabel=dict(
-            #    bgcolor='white',  # White background for tooltips
-           #     font_size=14,     # Tooltip font size
-           #     font_color='black'  # Tooltip font color
-           # )
-       # )
-       # return fig
-
-    # TSNE visualization function TENTATIVA 2 DE MUDAR CORES
-    #def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
-     #   words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
-     #   vectors = model.wv[words]
-
-      #  tsne = TSNE(n_components=2, random_state=42, perplexity=30)
-      #  reduced_vectors = tsne.fit_transform(vectors)
-
-      #  df_fe = pd.DataFrame({
-       #     'Token': words,
-        #    'x': reduced_vectors[:, 0],
-        #    'y': reduced_vectors[:, 1]
-       # })
-
-       # if selected_word:
-            # Find the neighbors of the selected word
-        #    neighbors = model.wv.most_similar(selected_word, topn=num_neighbors)
-        #    neighbor_words = [selected_word] + [word for word, _ in neighbors]
-         #   df_fe['color'] = df_fe['Token'].apply(
-           #     lambda x: '#FF4B4B' if x == selected_word else 
-           #             ('#FF904B' if x in neighbor_words else '#A0A0A0')  # Gray for others
-          #  )
-          #  df_filtered = df_fe[df_fe['Token'].isin(neighbor_words + [selected_word])]
-        #else:
-          #  df_fe['color'] = '#FF904B'  # Orange for all points
-          #  df_filtered = df_fe
-
-       # fig = px.scatter(
-        #    df_filtered, x='x', y='y', text='Token',
-         #   labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'},
-         #   color=df_filtered['color']  # Assign colors explicitly
-        #)
-        #fig.update_traces(
-           # textposition='top center',
-          #  marker=dict(size=14),  # Adjust marker size
-           # textfont=dict(color='white')  # White words
-       # )
-       # fig.update_layout(
-        #    plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
-        #    paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
-          #  font=dict(color='white'),  # White font for axis labels and title
-           # hoverlabel=dict(
-            #    bgcolor='white',  # White background for tooltips
-              #  font_size=14,     # Tooltip font size
-             #   font_color='black'  # Tooltip font color
-           # )
-      #  )
-       # return fig
-
-     # TSNE visualization function TENTATIVA 3
+     # TSNE visualization function
     def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
         words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
         vectors = model.wv[words]
@@ -205,7 +105,7 @@ with st.container():
             )
             df_filtered = df_fe[df_fe['Token'].isin(neighbor_words + [selected_word])]
         else:
-            df_fe['color'] = '#FF904B'  # Orange for all points
+            df_fe['color'] = '#FF4B4B'  # Red for all points
             df_filtered = df_fe
 
         # Create the scatter plot with Plotly Graph Objects
