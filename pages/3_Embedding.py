@@ -131,7 +131,56 @@ with st.container():
        # )
        # return fig
 
-    # TSNE visualization function
+    # TSNE visualization function TENTATIVA 2 DE MUDAR CORES
+    #def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
+     #   words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
+     #   vectors = model.wv[words]
+
+      #  tsne = TSNE(n_components=2, random_state=42, perplexity=30)
+      #  reduced_vectors = tsne.fit_transform(vectors)
+
+      #  df_fe = pd.DataFrame({
+       #     'Token': words,
+        #    'x': reduced_vectors[:, 0],
+        #    'y': reduced_vectors[:, 1]
+       # })
+
+       # if selected_word:
+            # Find the neighbors of the selected word
+        #    neighbors = model.wv.most_similar(selected_word, topn=num_neighbors)
+        #    neighbor_words = [selected_word] + [word for word, _ in neighbors]
+         #   df_fe['color'] = df_fe['Token'].apply(
+           #     lambda x: '#FF4B4B' if x == selected_word else 
+           #             ('#FF904B' if x in neighbor_words else '#A0A0A0')  # Gray for others
+          #  )
+          #  df_filtered = df_fe[df_fe['Token'].isin(neighbor_words + [selected_word])]
+        #else:
+          #  df_fe['color'] = '#FF904B'  # Orange for all points
+          #  df_filtered = df_fe
+
+       # fig = px.scatter(
+        #    df_filtered, x='x', y='y', text='Token',
+         #   labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'},
+         #   color=df_filtered['color']  # Assign colors explicitly
+        #)
+        #fig.update_traces(
+           # textposition='top center',
+          #  marker=dict(size=14),  # Adjust marker size
+           # textfont=dict(color='white')  # White words
+       # )
+       # fig.update_layout(
+        #    plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
+        #    paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
+          #  font=dict(color='white'),  # White font for axis labels and title
+           # hoverlabel=dict(
+            #    bgcolor='white',  # White background for tooltips
+              #  font_size=14,     # Tooltip font size
+             #   font_color='black'  # Tooltip font color
+           # )
+      #  )
+       # return fig
+
+     # TSNE visualization function TENTATIVA 3
     def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
         words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
         vectors = model.wv[words]
@@ -145,8 +194,8 @@ with st.container():
             'y': reduced_vectors[:, 1]
         })
 
+        # Define colors
         if selected_word:
-            # Find the neighbors of the selected word
             neighbors = model.wv.most_similar(selected_word, topn=num_neighbors)
             neighbor_words = [selected_word] + [word for word, _ in neighbors]
             df_fe['color'] = df_fe['Token'].apply(
@@ -158,16 +207,23 @@ with st.container():
             df_fe['color'] = '#FF904B'  # Orange for all points
             df_filtered = df_fe
 
-        fig = px.scatter(
-            df_filtered, x='x', y='y', text='Token',
-            labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'},
-            color=df_filtered['color']  # Assign colors explicitly
-        )
-        fig.update_traces(
-            textposition='top center',
-            marker=dict(size=14),  # Adjust marker size
-            textfont=dict(color='white')  # White words
-        )
+        # Create the scatter plot with Plotly Graph Objects
+        fig = go.Figure()
+
+        # Add points
+        fig.add_trace(go.Scatter(
+            x=df_filtered['x'],
+            y=df_filtered['y'],
+            mode='markers+text',
+            marker=dict(
+                color=df_filtered['color'],
+                size=10,
+            ),
+            text=df_filtered['Token'],
+            textposition='top center'
+        ))
+
+        # Customize layout
         fig.update_layout(
             plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
             paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
@@ -176,10 +232,12 @@ with st.container():
                 bgcolor='white',  # White background for tooltips
                 font_size=14,     # Tooltip font size
                 font_color='black'  # Tooltip font color
-            )
+            ),
+            xaxis_title='Dimensão 1',
+            yaxis_title='Dimensão 2'
         )
+    
         return fig
-
 
     # Streamlit Filters
     st.markdown('<p style="font-size:20px;">Você quer visualizar todas as palavras ou apenas uma palavra específica e seus vizinhos?</p>', unsafe_allow_html=True)
@@ -191,7 +249,7 @@ with st.container():
     st.write("")  # Adding a blank line
 
     if visualization_choice == "Visualizar todas as palavras":
-        st.write("Visualizando todas as palavras.")
+        st.write("Visualizando todas as palavras:")
         fig = visualize_embeddings(model)
     else:
         st.markdown('<p style="font-size:18px;">Escolha uma palavra para visualizar:</p>', unsafe_allow_html=True)
@@ -203,6 +261,6 @@ with st.container():
             st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos:')
             fig = visualize_embeddings(model, selected_word)
         else:
-            st.write("Por favor, escolha uma palavra para visualizar.")
+            st.write("Escolha uma palavra para visualizar:")
 
     st.plotly_chart(fig, use_container_width=True)
