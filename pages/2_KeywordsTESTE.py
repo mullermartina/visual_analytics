@@ -64,11 +64,11 @@ df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 ##########################################################
 # Contando o número de tokens SEM STOPWORDS 
 
-# Contando tokens sem considerar a nota
+# Count the number of tokens per grade
 df_va['num_tokens'] = df_va['tokenized_content'].apply(len)
 
 # Agrupando de acordo com cada nota
-qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
+#qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum() ESSA PARTE TIREI SÓ AQUI NESSA COPIA. O DEBAIXO JA TAVA COMENTADO
 
 
 # Verificando a ocorrência dos tokens (!!!!!!!! não ta no frequenciapalavrasv2_streamlit)
@@ -79,26 +79,38 @@ qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
 # Contando a ocorrência de cada token
 #token_counts = Counter(all_tokens) até aaqui não tá no arquivo acima
 
-# Agrupando a contagem de tokens de acordo com cada nota
+# Grouping the token frequencies by grade
 nota_token_counts = (
     df_va.groupby('nota')['tokenized_content']
     .apply(lambda texts: Counter([token for text in texts for token in text]))
 )
 
-# Convertendo cada token e contagem em um dataframe
-df_frequency = nota_token_counts.reset_index()
+# Convert the Counter into a DataFrame
+df_frequency = nota_token_counts.explode().reset_index()
 df_frequency.columns = ['nota', 'token', 'token_frequency']
-sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
+# sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False) nao tinha esa linha no chatgpt, alem do explode q tb adicionei
 
-df_words = pd.DataFrame()
+# Sort the tokens by frequency within each grade PARTE NOVA VIA CHATGPT
+df_frequency = (
+    df_frequency.sort_values(['nota', 'token_frequency'], ascending=[True, False])
+)
 
-# Agrupando a contagem de tokens por nota
+# Filter the top N tokens per grade PARTE NOVA VIA CHATGPT
 top_tokens_per_grade = (
-    sorted_tokens.groupby('nota')
-    .head(100)  # Assim mostra os 100 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
+    df_frequency.groupby('nota')
+    .head(100)  # Get the top 100 most frequent tokens for each grade
     .reset_index(drop=True)
 )
-df_words = top_tokens_per_grade
+
+# df_words = pd.DataFrame() TIREI ESSA LINHA AGORA COM O CHATGPT
+
+# Agrupando a contagem de tokens por nota ESSA PARTE TA CONTEMPLADA NO TRECHO ACIMA... VI POR CAUSA DO head(100)
+#top_tokens_per_grade = (
+ #   sorted_tokens.groupby('nota')
+  #  .head(100)  # Assim mostra os 100 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
+  #  .reset_index(drop=True)
+#)
+#df_words = top_tokens_per_grade
 
 ########################################################
 
@@ -107,53 +119,53 @@ df_words = top_tokens_per_grade
 
 # ==================================================================
 # Processamentos específicos para o segundo heatmap
-# ==================================================================
-file_path = 'texto_tarefa4.txt'
+# ================================================================== COMENEI TODA ESSA PARTE PRA NAO DAR RUIM NA HORA DE PLOTAR O NOVO HEATMAP
+#file_path = 'texto_tarefa4.txt'
 
 # Read the content of the file
-with open(file_path, "r", encoding="utf-8") as file:
-    given_text = file.read()
+#with open(file_path, "r", encoding="utf-8") as file:
+    #given_text = file.read()
 
 # Pré-processamento do texto de apoio + texto da tarefa
-cleaned_text = clean_cp(given_text)
-tokenized_text = tokenized_cp(cleaned_text)
+#cleaned_text = clean_cp(given_text)
+#tokenized_text = tokenized_cp(cleaned_text)
 
 # Retirando tokens do texto de apoio do conjunto de tokens dos textos dos candidatos
 # Ensure tokenized_text is a set for efficient subtraction
-tokenized_text_set = set(tokenized_text) # Using a set for tokenized_text ensures efficient lookups when checking if a token should be excluded.
+#tokenized_text_set = set(tokenized_text) # Using a set for tokenized_text ensures efficient lookups when checking if a token should be excluded.
 
 # Subtract tokenized_text from each row in 'tokenized_content'
-df_va['filtered_content'] = df_va['tokenized_content'].apply(
-    lambda tokens: [token for token in tokens if token not in tokenized_text_set]
-)
+#df_va['filtered_content'] = df_va['tokenized_content'].apply(
+   # lambda tokens: [token for token in tokens if token not in tokenized_text_set]
+#)
 
 # Contando o número de tokens SEM STOPWORDS (diferente do typestokenttr.ipynb) para cada texto: usarei isso para o gráfico 2, que demonstra o número mínimo e número máximo de tokens
 # Contando tokens sem considerar a nota
-df_va['num_tokens'] = df_va['filtered_content'].apply(len)
+#df_va['num_tokens'] = df_va['filtered_content'].apply(len)
 
 # Agrupando de acordo com cada nota
-qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
+#qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
 
 # Agrupando a contagem de tokens de acordo com cada nota MANTER
-nota_token_counts = (
-    df_va.groupby('nota')['filtered_content']
-    .apply(lambda texts: Counter([token for text in texts for token in text]))
-)
+##nota_token_counts = (
+   # df_va.groupby('nota')['filtered_content']
+   # .apply(lambda texts: Counter([token for text in texts for token in text]))
+#)
 
 # Convertendo cada token e contagem em um dataframe
-df_frequency = nota_token_counts.reset_index()
-df_frequency.columns = ['nota', 'token', 'token_frequency']
-sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
+#df_frequency = nota_token_counts.reset_index()
+#df_frequency.columns = ['nota', 'token', 'token_frequency']
+#sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
 
-df_words_ta = pd.DataFrame()
+#df_words_ta = pd.DataFrame()
 
 # Agrupando a contagem de tokens por nota de forma a mostrar os 15 mais comuns para cada nota ( 15 * 6 = 90 linhas portanto )
-top_tokens_per_grade = (
-    sorted_tokens.groupby('nota')
-    .head(100)  # Assim mostra os 1000 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
-    .reset_index(drop=True)
-)
-df_words_ta = top_tokens_per_grade
+#top_tokens_per_grade = (
+  #  sorted_tokens.groupby('nota')
+  #  .head(100)  # Assim mostra os 1000 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
+  #  .reset_index(drop=True)
+#)
+#df_words_ta = top_tokens_per_grade
 
 
 # ==================================================================
@@ -167,7 +179,7 @@ selected_grades = st.sidebar.multiselect(
 )
 
 # Filter Dataframes based on selected grades
-filtered_df_words = df_words[df_words['nota'].isin(selected_grades)]
+#filtered_df_words = df_words[df_words['nota'].isin(selected_grades)] ESSA LINHA TAVA ACUSANDO ERRO AGORA NO NOVO HEATMAP.. COMENTEI PRA DPS ARRUMAR
 
 st.markdown("")
 
@@ -191,7 +203,8 @@ with st.container():
 
 ##################################
     # Pivot the data for heatmap
-    heatmap_data = filtered_df_words.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
+    #heatmap_data = filtered_df_words.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number) VERSAO ANTERIOR, COM FILTRO E TAL
+    heatmap_data = top_tokens_per_grade.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number) #ESSE PEDACINHO head(number) nao tava no chatgpt
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
@@ -218,9 +231,8 @@ with st.container():
         width=1000
     )
 
-
-    #fig.update_yaxes(title="Tokens", tickfont=dict(size=14), automargin=True)
-    fig.update_yaxes(title="Tokens", showticklabels=False) # showticklabels=False para nao mostrar as palavras à esquerda, somente no tooltip
+    # Hide tick labels for cleaner visualization
+    fig.update_yaxes(title="Tokens", showticklabels=False)
     fig.update_xaxes(title="", showticklabels=False)
 
     # Show the figure
@@ -228,47 +240,47 @@ with st.container():
     st.plotly_chart( fig, use_container_width = True )
 ##################################
 
-
-with st.container():
-    st.subheader(f'{number} Palavras mais frequentes que não estão no enunciado ou no texto de apoio')
+# SEGUNBDO HEATMAP TODO COMENTADO PRA VER SE FAZ A VISUALIZAÇAO CERTINHA SOMENTE PRO PRIMEIRO ANTES
+#with st.container():
+   # st.subheader(f'{number} Palavras mais frequentes que não estão no enunciado ou no texto de apoio')
 
     # Pivot the data for heatmap
-    heatmap_data = df_words_ta.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
+   # heatmap_data = df_words_ta.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
 
     # Create the heatmap
-    fig = go.Figure(data=go.Heatmap(
-        z=heatmap_data.values,  # Frequency matrix
-        x=heatmap_data.columns,  # Grades (x-axis)
-        y=heatmap_data.index,    # Tokens (y-axis)
-        colorscale='Reds',       # Heatmap color scale
-        colorbar=dict(title="Frequência", titlefont=dict(size=14), tickfont=dict(size=12)),  # Legend title and font size
-        hoverongaps=False,       # Ensure no gaps show on hover
-        hovertemplate=(
-            "<span style='font-size:14px'><b>Token</b>: %{y}<br>" +  # Tooltip with larger font
-            "<b>Nota</b>: %{x}<br>" +
-            "<b>Frequência</b>: %{z}</span><extra></extra>"
-        )
-    ))
+   # fig = go.Figure(data=go.Heatmap(
+   #     z=heatmap_data.values,  # Frequency matrix
+    #    x=heatmap_data.columns,  # Grades (x-axis)
+    #    y=heatmap_data.index,    # Tokens (y-axis)
+     #   colorscale='Reds',       # Heatmap color scale
+     #   colorbar=dict(title="Frequência", titlefont=dict(size=14), tickfont=dict(size=12)),  # Legend title and font size
+      #  hoverongaps=False,       # Ensure no gaps show on hover
+      #  hovertemplate=(
+      #      "<span style='font-size:14px'><b>Token</b>: %{y}<br>" +  # Tooltip with larger font
+       #     "<b>Nota</b>: %{x}<br>" +
+       #     "<b>Frequência</b>: %{z}</span><extra></extra>"
+       # )
+    #))
 
     # Update layout for better visualization
-    fig.update_layout(
-        template="plotly_white",
-        plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
-        paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-        font=dict(color="white", size=14),  # Update general font size
-        height=600,  # Adjust height
-        width=1000,   # Keep width consistent
-    )
+    #fig.update_layout(
+    #    template="plotly_white",
+     #   plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
+     #   paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
+      #  font=dict(color="white", size=14),  # Update general font size
+      #  height=600,  # Adjust height
+       # width=1000,   # Keep width consistent
+   # )
 
     # Update y-axis to hide tokens
-    fig.update_yaxes(
-        title="",  # No y-axis title
-        showticklabels=False,  # Hide tokens from y-axis
-    )
+   # fig.update_yaxes(
+     #   title="",  # No y-axis title
+      #  showticklabels=False,  # Hide tokens from y-axis
+   # )
 
     # Update x-axis for better styling
-    fig.update_xaxes(title="", showticklabels=False)
+    #fig.update_xaxes(title="", showticklabels=False)
 
     # Show the figure
-    fig.show()
-    st.plotly_chart( fig, use_container_width = True )
+   # fig.show()
+    #st.plotly_chart( fig, use_container_width = True )

@@ -159,7 +159,7 @@ with st.container():
         st.write("")  # Adding a blank line
 
         if selected_word:
-            st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos:')
+            st.write(f'Visualizando a palavra **{selected_word}** e seus vizinhos mais próximos:')
             fig = visualize_embeddings(model, selected_word)
         else:
             st.write("Escolha uma palavra para visualizar:")
