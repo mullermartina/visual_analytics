@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 import nltk
-from collections import Counter #uso para n-gramas
-import re # talvez regex vai ajudar na normalizaçao
+from collections import Counter
+import re
 import plotly.graph_objects as go
 import streamlit as st
 
