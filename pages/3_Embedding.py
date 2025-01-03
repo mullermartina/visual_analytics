@@ -7,6 +7,7 @@ import plotly.express as px #biblio q pus pra essa viz
 from sklearn.manifold import TSNE #biblio q pus pra essa viz
 from gensim.models import Word2Vec
 import streamlit as st
+import plotly.graph_objects as go
 
 # ==================================================================
 # Configurações da Página 
