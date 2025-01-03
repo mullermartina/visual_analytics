@@ -178,7 +178,7 @@ with st.container():
         ),
         hoverlabel=dict(
         bgcolor="#FFFFFF",  # Light red background
-        font_size=16,       # Tooltip font size      TROQUEI TAMANHO DA FONTE AQUI
+        font_size=14,       # Tooltip font size      TROQUEI TAMANHO DA FONTE AQUI
         font_color="black"  # Tooltip text color
         )
     )
@@ -360,5 +360,5 @@ with st.container():
 
     # Show the figure
     fig.show()
-    st.plotly_chart( fig ) # use_container_width = True pra usar toda largura disponível
+    st.plotly_chart( fig, use_container_width = True ) # use_container_width = True pra usar toda largura disponível
 

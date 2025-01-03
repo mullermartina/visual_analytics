@@ -55,8 +55,6 @@ def tokenized_cp(text):
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 
-# AQUI Q VAI ALGUM FILTRO? OU METER DIRETO NA PÁGINA?
-
 # Prepare the tokenized corpus
 tokenized_corpus = df_va['tokenized_content'].tolist()
 
@@ -72,21 +70,18 @@ model = Word2Vec( # Se ficar pesado, inserir no streamlit somente o modelo trein
     workers=4                   # Number of worker threads
 )
 
-
 # ==================================================================
 # Layout no Streamlit
 # ==================================================================
 st.header( 'Embedding Fixa ' )
 
 with st.container():
-    st.markdown( """---""" )
-    st.subheader( 'Embedding das Palavras do Corpus' )
-
+    st.markdown("""---""")
+    st.subheader('Embedding das Palavras do Corpus')
 
     # TSNE visualization function
-
-    def visualize_embeddings(model, num_points=1000):
-        words = list(model.wv.index_to_key)[:num_points]  # num_points limits the number of words to display
+    def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
+        words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
         vectors = model.wv[words]
 
         tsne = TSNE(n_components=2, random_state=42, perplexity=30)
@@ -98,14 +93,30 @@ with st.container():
             'y': reduced_vectors[:, 1]
         })
 
+        if selected_word:
+            # Find the neighbors of the selected word
+            neighbors = model.wv.most_similar(selected_word, topn=num_neighbors)
+            neighbor_words = [selected_word] + [word for word, _ in neighbors]
+            df_filtered = df_fe[df_fe['Token'].isin(neighbor_words)]
+            highlight_color = '#FF4B4B'  # Red for selected word
+            df_fe['color'] = df_fe['Token'].apply(
+                lambda x: highlight_color if x == selected_word else '#FF4B4B'
+            )
+            df_filtered['color'] = df_filtered['Token'].apply(
+                lambda x: highlight_color if x == selected_word else '#FF4B4B'
+            )
+        else:
+            df_filtered = df_fe
+            df_fe['color'] = '#FF904B' # Orange
+
         fig = px.scatter(
-            df_fe, x='x', y='y', text='Token',
-            #title="t-SNE Visualization of Word Embeddings",
-            labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'}
+            df_filtered, x='x', y='y', text='Token',
+            labels={'x': 'Dimensão 1', 'y': 'Dimensão 2'},
+            color=df_filtered['color']
         )
         fig.update_traces(
             textposition='top center',
-            marker=dict(color='#FF4B4B'),  # Streamlit red color
+            marker=dict(size=14),  # Adjust marker size
             textfont=dict(color='white')  # White words
         )
         fig.update_layout(
@@ -114,11 +125,56 @@ with st.container():
             font=dict(color='white'),  # White font for axis labels and title
             hoverlabel=dict(
                 bgcolor='white',  # White background for tooltips
-                font_size=12,     # Tooltip font size
+                font_size=14,     # Tooltip font size
                 font_color='black'  # Tooltip font color
             )
         )
         return fig
 
-    visualize_embeddings(model)
-    st.plotly_chart( visualize_embeddings(model), use_container_width=True )
+    # Streamlit Filters
+    #visualization_choice = st.radio(
+       # "Você quer visualizar todas as palavras ou apenas uma palavra específica e seus vizinhos?",
+       # options=["Visualizar todas as palavras", "Visualizar uma palavra específica e seus vizinhos"]
+    #)
+
+    #if visualization_choice == "Visualizar todas as palavras":
+       # st.write("Visualizando todas as palavras.")
+       # fig = visualize_embeddings(model)
+    #else:
+     #   word_list = list(model.wv.index_to_key)  # Full list of vocabulary
+      #  selected_word = st.selectbox('Escolha uma palavra para visualizar:', word_list)
+       # if selected_word:
+        #    st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos:')
+        #    fig = visualize_embeddings(model, selected_word)
+        #else:
+        #    st.write("Por favor, escolha uma palavra para visualizar.")
+
+    #st.plotly_chart(fig, use_container_width=True)
+
+
+
+    # Streamlit Filters
+    st.markdown('<p style="font-size:20px;">Você quer visualizar todas as palavras ou apenas uma palavra específica e seus vizinhos?</p>', unsafe_allow_html=True)
+    visualization_choice = st.radio(
+        "",
+        options=["Visualizar todas as palavras", "Visualizar uma palavra específica e seus vizinhos"]
+    )
+
+    st.write("")  # Adding a blank line
+
+    if visualization_choice == "Visualizar todas as palavras":
+        st.write("Visualizando todas as palavras.")
+        fig = visualize_embeddings(model)
+    else:
+        st.markdown('<p style="font-size:18px;">Escolha uma palavra para visualizar:</p>', unsafe_allow_html=True)
+        word_list = list(model.wv.index_to_key)  # Full list of vocabulary
+        selected_word = st.selectbox('', word_list)
+        st.write("")  # Adding a blank line
+
+        if selected_word:
+            st.write(f'Visualizando a palavra **{selected_word}** e seus 10 vizinhos mais próximos:')
+            fig = visualize_embeddings(model, selected_word)
+        else:
+            st.write("Por favor, escolha uma palavra para visualizar.")
+
+    st.plotly_chart(fig, use_container_width=True)
