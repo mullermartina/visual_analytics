@@ -176,7 +176,7 @@ number = st.sidebar.slider(
     "Escolha o número de palavras mais frequentes que você deseja exibir",
     min_value=1,  # Minimum value of the slider
     max_value=50,  # Maximum value of the slider
-    value=20,  # Default value
+    value=15,  # Default value
     step=1  # Step size
 )
 
