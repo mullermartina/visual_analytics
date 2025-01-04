@@ -8,15 +8,15 @@ import plotly.graph_objects as go
 import streamlit as st
 
 # ==================================================================
-# Settings
+# Page Settings
 # ==================================================================
 st.set_page_config(page_title = 'Tokens e Types',
                   layout= 'centered')
 
 # ==================================================================
-#Import dataset
+# Import dataset
 # ==================================================================
-csv_file_path = 'corpus_completo.csv'
+csv_file_path = 'complete_corpus.csv'
 
 # Read csv
 df = pd.read_csv(csv_file_path)
@@ -27,12 +27,12 @@ df_va = df.copy()
 # ==================================================================
 # Preprocessing
 # ==================================================================
-df_va.groupby('nota').count()
+df_va.groupby('grade').count()
 
 df_chart = pd.DataFrame()
 
 # Number of texts
-df_chart['qtde_textos'] = df_va['nota'].value_counts()
+df_chart['qty_texts'] = df_va['grade'].value_counts()
 
 nltk.download('stopwords')
 nltk.download('punkt') # Tokenizer, important to nltk.word_tokenize
@@ -61,10 +61,10 @@ df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
 # Count the number of tokens accordingly to each grade       
-df_chart['qtde_total_tokens_nota'] = df_va.groupby('nota')['token_count'].sum()
+df_chart['qty_total_tokens_grade'] = df_va.groupby('grade')['token_count'].sum()
 
 # Verifying the average number os tokens for each grade
-df_chart['qtde_media_tokens'] = round((df_chart['qtde_total_tokens_nota'] / df_chart['qtde_textos']),2)
+df_chart['qty_avg_tokens'] = round((df_chart['qty_total_tokens_grade'] / df_chart['qty_texts']),2)
 
 # Count types (tokens without repetition)
 df_va['types_content'] = df_va['tokenized_content'].apply(lambda tokens: list(set(tokens)))
@@ -75,13 +75,13 @@ df_va['types_content'] = df_va['tokenized_content'].apply(lambda tokens: list(se
 df_va['types_count'] = df_va['types_content'].apply(len)
 
 # Count the number of types accordingly to each grade
-df_chart['qtde_total_types_nota'] = df_va.groupby('nota')['types_count'].sum()
+df_chart['qty_total_types_grade'] = df_va.groupby('grade')['types_count'].sum()
 
 # Verifying the average number os types for each grade
-df_chart['qtde_media_types'] = round((df_chart['qtde_total_types_nota'] / df_chart['qtde_textos']),2)
+df_chart['qty_avg_types'] = round((df_chart['qty_total_types_grade'] / df_chart['qty_texts']),2)
 
-# TTR = qtde de types / qtde de tokens * 100 (em percentual mesmo)
-df_chart['TTR'] = round(((df_chart['qtde_total_types_nota'] / df_chart['qtde_total_tokens_nota']) * 100),2)
+# TTR
+df_chart['TTR'] = round(((df_chart['qty_total_types_grade'] / df_chart['qty_total_tokens_grade']) * 100),2)
 
 # Minimum number os tokens to each grade
 
@@ -89,7 +89,7 @@ df_chart['TTR'] = round(((df_chart['qtde_total_types_nota'] / df_chart['qtde_tot
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
 # Minimum number os tokens to each grade     
-df_chart['qtde_tokens_min'] = df_va.groupby('nota')['token_count'].min()
+df_chart['qty_tokens_min'] = df_va.groupby('grade')['token_count'].min()
 
 # Maximum number os tokens to each grade
 
@@ -97,16 +97,16 @@ df_chart['qtde_tokens_min'] = df_va.groupby('nota')['token_count'].min()
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
 # Maximum number os tokens to each grade      
-df_chart['qtde_tokens_max'] = df_va.groupby('nota')['token_count'].max()
+df_chart['qty_tokens_max'] = df_va.groupby('grade')['token_count'].max()
 
 # Standard deviation of the number of tokens by grade
 
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
-df_chart['desvpad_qtde_tokens'] = round((df_va.groupby('nota')['token_count'].std()),2)
+df_chart['std_qty_tokens'] = round((df_va.groupby('grade')['token_count'].std()),2)
 
-df_chart['nota_real'] = [3, 2, 4, 5, 1, 0]
-df_chart.sort_values('nota_real')
+df_chart['real_grade'] = [3, 2, 4, 5, 1, 0]
+df_chart.sort_values('real_grade')
 
 # ==================================================================
 # Sidebar
@@ -119,8 +119,8 @@ selected_grades = st.sidebar.multiselect(
 )
 
 # Filter DataFrames based on selected grades
-filtered_df_chart = df_chart[df_chart['nota_real'].isin(selected_grades)]
-filtered_df_va = df_va[df_va['nota'].isin(selected_grades)]
+filtered_df_chart = df_chart[df_chart['real_grade'].isin(selected_grades)]
+filtered_df_va = df_va[df_va['grade'].isin(selected_grades)]
 
 # ==================================================================
 # Layout no Streamlit
@@ -134,9 +134,9 @@ with st.container():
     # Create the bar chart
     fig = px.bar(
       filtered_df_chart,  # Pass the entire DataFrame
-      x='nota_real',  # X-axis
-      y='qtde_textos',  # Y-axis
-      labels={'qtde_textos': 'Quantidade', 'nota_real': 'Nota'},  # Custom axis labels
+      x='real_grade',  # X-axis
+      y='qty_texts',  # Y-axis
+      labels={'qty_texts': 'Quantidade', 'real_grade': 'Nota'},  # Custom axis labels
       color_discrete_sequence=['#FF4B4B']  # Streamlit red color
     )
 
@@ -177,15 +177,15 @@ with st.container():
     st.markdown( """---""" )
     st.subheader( 'Número Máximo e Mínimo de Tokens ')
     
-    customdata = filtered_df_chart[['qtde_media_tokens', 'desvpad_qtde_tokens']].values
+    customdata = filtered_df_chart[['qty_avg_tokens', 'std_qty_tokens']].values
 
     # Create the figure
     fig = go.Figure()
 
     # Add the bars for max tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_tokens_max'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_tokens_max'], 
         name='Máximo de tokens', 
         marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
@@ -198,8 +198,8 @@ with st.container():
 
     # Add the bars for min tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_tokens_min'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_tokens_min'], 
         name='Mínimo de tokens', 
         marker_color='#FF904B',  # New color: orange
         hovertemplate=(
@@ -249,8 +249,8 @@ with st.container():
 
     # Add the bars for avg tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_media_tokens'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_avg_tokens'], 
         name='Média de tokens', 
         marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
@@ -262,8 +262,8 @@ with st.container():
 
     # Add the bars for avg types
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_media_types'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_avg_types'], 
         name='Média de types', 
         marker_color='#FF904B',  # New color: orange
         hovertemplate=(
@@ -306,19 +306,19 @@ with st.container():
 
 with st.container():
     st.markdown( """---""" )
-    st.subheader( 'Número de Tokens e Types de Cada Texto Segundo Cada Nota' )
+    st.subheader( 'Distribuição de Types e Tokens por Notas' )
 
     # Create the scatterplot
     fig = px.scatter(
         filtered_df_va,
         x='token_count',                # x-axis: total tokens
         y='types_count',                # y-axis: unique tokens
-        color='nota',                   # Color the dots based on the 'nota' column
-        hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota' #title="Quantidade de Tokens e Types segundo Nota"
+        color='grade',                   # Color the dots based on the 'grade' column
+        hover_data=['token_count', 'types_count', 'grade'],  # Tooltip includes 'grade' #title="Quantidade de Tokens e Types segundo Nota"
         labels={
             'token_count': 'Tokens',
             'types_count': 'Types',
-            'nota': 'Nota'
+            'grade': 'Nota'
         },
         color_continuous_scale='Agsunset' 
     )

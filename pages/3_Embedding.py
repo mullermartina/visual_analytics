@@ -18,7 +18,7 @@ st.set_page_config(page_title = 'Embedding Fixa',
 # ==================================================================
 #Import dataset
 # ==================================================================
-csv_file_path = 'corpus_completo.csv'
+csv_file_path = 'complete_corpus.csv'
 
 # Lendo o csv como um df
 df = pd.read_csv(csv_file_path)
