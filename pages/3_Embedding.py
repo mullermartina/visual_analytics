@@ -1,57 +1,55 @@
 import pandas as pd
 import numpy as np
 import nltk
-from collections import Counter #uso para n-gramas
+from collections import Counter
 import re 
-import plotly.express as px #biblio q pus pra essa viz
-from sklearn.manifold import TSNE #biblio q pus pra essa viz
+import plotly.express as px
+from sklearn.manifold import TSNE
 from gensim.models import Word2Vec
 import streamlit as st
 import plotly.graph_objects as go
 
 # ==================================================================
-# Configurações da Página 
+# Page Settings
 # ==================================================================
 st.set_page_config(page_title = 'Embedding Fixa',
                   layout= 'centered')
 
 # ==================================================================
-#Import dataset
+# Import dataset
 # ==================================================================
 csv_file_path = 'complete_corpus.csv'
 
-# Lendo o csv como um df
+# Read csv
 df = pd.read_csv(csv_file_path)
 
-#Criando uma cópia
+# Create a copy
 df_va = df.copy()
 
 # ==================================================================
-# Pré-Processamento
+# Preprocessing
 # ==================================================================
 
 nltk.download('stopwords')
-nltk.download('punkt') # é um tokenizador, importante para nltk.word_tokenize
-nltk.download('punkt_tab') # download desse pacote pq o punkt sozinho nao tava funcionando
+nltk.download('punkt') # Tokenizer, important to nltk.word_tokenize
+nltk.download('punkt_tab') # Because just the line above was not working
 
-# Pré-processamento
-#Retirada de sinais gráficos, pontuações e espaços
+# Removal of graphic symbols, punctuation, and spaces. I kept accents and removed numbers
 def clean_cp(text):
-    cleaned = text.lower() #Deixando tudo minúsculo
-    cleaned = re.sub('[^\w\s]', '', cleaned) # Removendo pontuacao
-    #cleaned = re.sub('[0-9]+', '', cleaned) # Removendo números 
-    cleaned = re.sub('\d+', '', cleaned) # Removendo números NÃO TAVA FUNCIONANDO. Começou a funcionar qdo pus o lower como primeiro comando da funçao
-    cleaned = re.sub('\s+', ' ', cleaned) # Removendo espaços extras
+    cleaned = text.lower() # All lowercase
+    cleaned = re.sub('[^\w\s]', '', cleaned) # Removing punctuation
+    cleaned = re.sub('\d+', '', cleaned) # Removing numbers
+    cleaned = re.sub('\s+', ' ', cleaned) # Removing extra spaces
     cleaned = re.sub('\s+', ' ', cleaned)
-    return cleaned.strip() # Removendo tabs
+    return cleaned.strip() # Removing tabs
 
 df_va['content'] = df_va['content'].apply(clean_cp)
 
-# Tokenizando e retirando stopwords: retiro stopwords pq embeddings fixas nao consideram contexto
+# Tokenizing and removing stopwords: fixed embeddings doesn't considerate context
 def tokenized_cp(text):
-   stopwords = nltk.corpus.stopwords.words('portuguese') # Carregando as stopwords do português
-   tokenized = nltk.word_tokenize(text, language='portuguese') #Transforma o texto em tokens
-   text_sem_stopwords = [token for token in tokenized if token not in stopwords] # Deixando somente o que nao é stopword no texto
+   stopwords = nltk.corpus.stopwords.words('portuguese') # Loading the Portuguese stopwords
+   tokenized = nltk.word_tokenize(text, language='portuguese') # Tokenizing
+   text_sem_stopwords = [token for token in tokenized if token not in stopwords] # Removing stopwords
    return text_sem_stopwords
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
@@ -60,16 +58,16 @@ df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 tokenized_corpus = df_va['tokenized_content'].tolist()
 
 # ==================================================================
-# Treinamento da Embedding
+# Embedding Training
 # ==================================================================
-model = Word2Vec( # Se ficar pesado, inserir no streamlit somente o modelo treinado já
-    sentences=tokenized_corpus,  # Input tokenized sentences
-    vector_size=100,            # Dimensionality of the embedding vectors
-    window=5,                   # Context window size
-    min_count=1,                # Minimum word frequency
-    sg=0,                       # CBOW (0) or Skip-gram (1)
-    workers=1,                  # workers=1 to eliminate ordering jitter from OS thread scheduling. To do a reproducible run
-    seed=42                     # To do a reproducible run
+model = Word2Vec( 
+    sentences=tokenized_corpus, # Input tokenized sentences
+    vector_size=100, # Dimensionality of the embedding vectors
+    window=5, # Context window size
+    min_count=1, # Minimum word frequency
+    sg=0, # CBOW (0) or Skip-gram (1)
+    workers=1, # workers=1 to do a reproducible run
+    seed=42 # To do a reproducible run
 )
 
 # ==================================================================
@@ -108,7 +106,7 @@ with st.container():
             df_fe['color'] = '#FF4B4B'  # Red for all points
             df_filtered = df_fe
 
-        # Create the scatter plot with Plotly Graph Objects
+        # Create the scatter plot
         fig = go.Figure()
 
         # Add points
@@ -131,7 +129,7 @@ with st.container():
             font=dict(color='white'),  # White font for axis labels and title
             hoverlabel=dict(
                 bgcolor='white',  # White background for tooltips
-                font_size=14,     # Tooltip font size
+                font_size=14,  # Tooltip font size
                 font_color='black'  # Tooltip font color
             ),
             xaxis_title='Dimensão 1',

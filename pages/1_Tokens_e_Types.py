@@ -1,129 +1,115 @@
 import pandas as pd
 import numpy as np
 import nltk
-from collections import Counter #uso para n-gramas
-import re # talvez regex vai ajudar na normalizaçao
+from collections import Counter
+import re 
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
 # ==================================================================
-# Configurações da Página 
+# Page Settings
 # ==================================================================
 st.set_page_config(page_title = 'Tokens e Types',
                   layout= 'centered')
 
 # ==================================================================
-#Import dataset
+# Import dataset
 # ==================================================================
-csv_file_path = 'corpus_completo.csv'
+csv_file_path = 'complete_corpus.csv'
 
-# Lendo o csv como um df
+# Read csv
 df = pd.read_csv(csv_file_path)
 
-#Criando uma cópia
+# Create a copy
 df_va = df.copy()
 
 # ==================================================================
-# Pré-Processamento
+# Preprocessing
 # ==================================================================
-df_va.groupby('nota').count()
+df_va.groupby('grade').count()
 
 df_chart = pd.DataFrame()
 
-# Número de textos exposto como variável visto que usarei para cálculos de média
-df_chart['qtde_textos'] = df_va['nota'].value_counts()
+# Number of texts
+df_chart['qty_texts'] = df_va['grade'].value_counts()
 
 nltk.download('stopwords')
-nltk.download('punkt') # é um tokenizador, importante para nltk.word_tokenize
-# nltk.download('rslp') é um stemmer. acho q nao vou usar
-nltk.download('punkt_tab') # Precisei que devia fazer download desse pacote pq o punkt nao tava funcionando
+nltk.download('punkt') # Tokenizer, important to nltk.word_tokenize
+nltk.download('punkt_tab') # Because just the line above was not working
 
-# Pré-processamento streamlit run Tokens_Types.py
-
-#Retirada de sinais gráficos, pontuações e espaços: deixei acentos, retirei números, não fiz stemming
+# Removal of graphic symbols, punctuation, and spaces: I kept accents, removed numbers, and did not apply stemming
 def clean_cp(text):
-    cleaned = text.lower() #Deixando tudo minúsculo
-    cleaned = re.sub('[^\w\s]', '', cleaned) # Removendo pontuacao
-    #cleaned = re.sub('[0-9]+', '', cleaned) # Removendo números 
-    cleaned = re.sub('\d+', '', cleaned) # Removendo números
-    cleaned = re.sub('\s+', ' ', cleaned) # Removendo espaços extras
-    cleaned = re.sub('\s+', ' ', cleaned)
-    return cleaned.strip() # Removendo tabs
+    cleaned = text.lower() # All lowercase
+    cleaned = re.sub('[^\w\s]', '', cleaned) # Removing punctuation
+    cleaned = re.sub('\d+', '', cleaned) # Removing numbers
+    cleaned = re.sub('\s+', ' ', cleaned) # Removing extra spaces
+    return cleaned.strip() # Removing tabs
 
 df_va['content'] = df_va['content'].apply(clean_cp)
-#df_va['content'] = df_va['content'].apply(stopwords_cp)
 
-# Tokenizando SEM retirar stopwords: lembrando q token conta duplicados
-
+# Tokenizing WITHOUT removing stopwords
 def tokenized_cp(text):
-   #stopwords = nltk.corpus.stopwords.words('portuguese') # Carregando as stopwords do português
-   tokenized = nltk.word_tokenize(text, language='portuguese') #Transforma o texto em tokens
-   #text_sem_stopwords = [token for token in tokenized if token not in stopwords] # Deixei stopwords pq imaginei que consideravam mas talvez a divergencia de numero q achei em relaçao a
-   # dissertacao seja devido às stopwords
-   #return text_sem_stopwords
+   tokenized = nltk.word_tokenize(text, language='portuguese') # Text to tokens
    return tokenized
 
 df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 
-# Verificando a qtde de tokens para cada nota (uso o total pra cada nota pro cálculo de TTR)
+# Verifying the number of tokens for each grade (I use the total for each grade to calculate TTR)
 
-# Primeiro conto a qtde de tokens para cada texto e crio uma coluna com a contagem
+# Count the number of tokens for each text and create a column with the count
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
-# Agora, conto de acordo com cada nota        
-df_chart['qtde_total_tokens_nota'] = df_va.groupby('nota')['token_count'].sum()
+# Count the number of tokens accordingly to each grade       
+df_chart['qty_total_tokens_grade'] = df_va.groupby('grade')['token_count'].sum()
 
-# Verificando a qtde de tokens MÉDIA para cada nota
-df_chart['qtde_media_tokens'] = round((df_chart['qtde_total_tokens_nota'] / df_chart['qtde_textos']),2)
+# Verifying the average number os tokens for each grade
+df_chart['qty_avg_tokens'] = round((df_chart['qty_total_tokens_grade'] / df_chart['qty_texts']),2)
 
-# Separando em types (pego tokens e retiro duplicados)
+# Count types (tokens without repetition)
 df_va['types_content'] = df_va['tokenized_content'].apply(lambda tokens: list(set(tokens)))
 
-# Verificando a qtde de types para cada nota
+# Verifying the number of types for each grade
 
-# Primeiro a qtde de types para cada texto e crio uma coluna com a contagem
+# Count the number of types for each text and create a column with the count
 df_va['types_count'] = df_va['types_content'].apply(len)
 
-# Agora, conto de acordo com cada nota
-df_chart['qtde_total_types_nota'] = df_va.groupby('nota')['types_count'].sum()
+# Count the number of types accordingly to each grade
+df_chart['qty_total_types_grade'] = df_va.groupby('grade')['types_count'].sum()
 
-# Verificando a qtde de types MÉDIA para cada nota ACHO Q NAO VOU USAR
-df_chart['qtde_media_types'] = round((df_chart['qtde_total_types_nota'] / df_chart['qtde_textos']),2)
+# Verifying the average number os types for each grade
+df_chart['qty_avg_types'] = round((df_chart['qty_total_types_grade'] / df_chart['qty_texts']),2)
 
-# Cálculo de TTR: TTR = qtde de types / qtde de tokens * 100 (em percentual mesmo)
-# Aviso: fiz o cálculo de ttr_medio = (qtde_media_types / qtde_media_tokens) * 100 e obtive os mesmos valores
-df_chart['TTR'] = round(((df_chart['qtde_total_types_nota'] / df_chart['qtde_total_tokens_nota']) * 100),2)
+# TTR
+df_chart['TTR'] = round(((df_chart['qty_total_types_grade'] / df_chart['qty_total_tokens_grade']) * 100),2)
 
-# Número mínimo de tokens por nota
+# Minimum number os tokens to each grade
 
-# Primeiro conto a qtde de tokens para cada texto e crio uma coluna com a contagem    >> Essas 2 linhas eu repeti mtas vzs no código. É só cortar fora. A variável já foi calculada!
+# Number os tokens to each text
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
-# Agora, conto o número minimo de tokens para cada nota        
-df_chart['qtde_tokens_min'] = df_va.groupby('nota')['token_count'].min()
+# Minimum number os tokens to each grade     
+df_chart['qty_tokens_min'] = df_va.groupby('grade')['token_count'].min()
 
-# Número máximo de tokens por nota
+# Maximum number os tokens to each grade
 
-# Primeiro conto a qtde de tokens para cada texto e crio uma coluna com a contagem
+# Number os tokens to each text ## remove this line. i already calculated
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
-# Agora, conto o número máximo de tokens para cada nota        
-df_chart['qtde_tokens_max'] = df_va.groupby('nota')['token_count'].max()
+# Maximum number os tokens to each grade      
+df_chart['qty_tokens_max'] = df_va.groupby('grade')['token_count'].max()
 
-# Desvio padrão do número de tokens por nota
+# Standard deviation of the number of tokens by grade
 
-# Primeiro conto a qtde de tokens para cada texto e crio uma coluna com a contagem
 df_va['token_count'] = df_va['tokenized_content'].apply(len)
 
-# Agora, conto o número máximo de tokens para cada nota
-df_chart['desvpad_qtde_tokens'] = round((df_va.groupby('nota')['token_count'].std()),2)
+df_chart['std_qty_tokens'] = round((df_va.groupby('grade')['token_count'].std()),2)
 
-df_chart['nota_real'] = [3, 2, 4, 5, 1, 0]
-df_chart.sort_values('nota_real')
+df_chart['real_grade'] = [3, 2, 4, 5, 1, 0]
+df_chart.sort_values('real_grade')
 
 # ==================================================================
-# Barra Lateral no Streamlit 
+# Sidebar
 # ==================================================================
 st.sidebar.markdown( '## Filtro' )
 
@@ -133,8 +119,8 @@ selected_grades = st.sidebar.multiselect(
 )
 
 # Filter DataFrames based on selected grades
-filtered_df_chart = df_chart[df_chart['nota_real'].isin(selected_grades)]
-filtered_df_va = df_va[df_va['nota'].isin(selected_grades)]
+filtered_df_chart = df_chart[df_chart['real_grade'].isin(selected_grades)]
+filtered_df_va = df_va[df_va['grade'].isin(selected_grades)]
 
 # ==================================================================
 # Layout no Streamlit
@@ -148,9 +134,9 @@ with st.container():
     # Create the bar chart
     fig = px.bar(
       filtered_df_chart,  # Pass the entire DataFrame
-      x='nota_real',  # X-axis
-      y='qtde_textos',  # Y-axis
-      labels={'qtde_textos': 'Quantidade', 'nota_real': 'Nota'},  # Custom axis labels
+      x='real_grade',  # X-axis
+      y='qty_texts',  # Y-axis
+      labels={'qty_texts': 'Quantidade', 'real_grade': 'Nota'},  # Custom axis labels
       color_discrete_sequence=['#FF4B4B']  # Streamlit red color
     )
 
@@ -170,7 +156,7 @@ with st.container():
         font=dict(color="white"),  # White font for titles, labels, and text
         xaxis=dict(
         showgrid=False,  # Remove vertical gridlines
-        color="white"    # White font for x-axis labels
+        color="white"  # White font for x-axis labels
         ),
         yaxis=dict(
         #showgrid=False,  # Remove horizontal gridlines
@@ -178,7 +164,7 @@ with st.container():
         ),
         hoverlabel=dict(
         bgcolor="#FFFFFF",  # Light red background
-        font_size=14,       # Tooltip font size      TROQUEI TAMANHO DA FONTE AQUI
+        font_size=14,   # Tooltip font size
         font_color="black"  # Tooltip text color
         )
     )
@@ -191,15 +177,15 @@ with st.container():
     st.markdown( """---""" )
     st.subheader( 'Número Máximo e Mínimo de Tokens ')
     
-    customdata = filtered_df_chart[['qtde_media_tokens', 'desvpad_qtde_tokens']].values
+    customdata = filtered_df_chart[['qty_avg_tokens', 'std_qty_tokens']].values
 
     # Create the figure
     fig = go.Figure()
 
     # Add the bars for max tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_tokens_max'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_tokens_max'], 
         name='Máximo de tokens', 
         marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
@@ -212,10 +198,10 @@ with st.container():
 
     # Add the bars for min tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_tokens_min'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_tokens_min'], 
         name='Mínimo de tokens', 
-        marker_color='#FF904B',  # Nova cor: laranja
+        marker_color='#FF904B',  # New color: orange
         hovertemplate=(
             "Mínimo de tokens: %{y}<br>" +
             "Número médio: %{customdata[0]:.2f}<br>" +
@@ -226,7 +212,6 @@ with st.container():
 
     # Update layout for better visualization
     fig.update_layout(
-        #title="Números Máximo e Mínimo de Tokens",
         xaxis_title="Nota",
         yaxis_title="Quantidade",
         barmode='group',  # Grouped bars
@@ -245,7 +230,7 @@ with st.container():
         ),
         hoverlabel=dict(
             bgcolor="#FFFFFF",  # Light red background for tooltip
-            font_size=14,       # Tooltip font size        TROQUEI TAMANHO DA FONTE AQUI
+            font_size=14,  # Tooltip font size
             font_color="black"  # Tooltip text color
         )
     )
@@ -264,10 +249,10 @@ with st.container():
 
     # Add the bars for avg tokens
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_media_tokens'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_avg_tokens'], 
         name='Média de tokens', 
-        marker_color='#FF4B4B',  # Vermelho do Streamlit
+        marker_color='#FF4B4B',  # Streamlit-like red
         hovertemplate=(
             "Média de tokens: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
@@ -277,10 +262,10 @@ with st.container():
 
     # Add the bars for avg types
     fig.add_trace(go.Bar(
-        x=filtered_df_chart['nota_real'], 
-        y=filtered_df_chart['qtde_media_types'], 
+        x=filtered_df_chart['real_grade'], 
+        y=filtered_df_chart['qty_avg_types'], 
         name='Média de types', 
-        marker_color='#FF904B',  # Nova cor: laranja
+        marker_color='#FF904B',  # New color: orange
         hovertemplate=(
             "Média de types: %{y}<br>" +
             "TTR: %{customdata:.2f}<extra></extra>%"       
@@ -291,7 +276,6 @@ with st.container():
 
     # Update layout for better visualization
     fig.update_layout(
-        #title="Número Médio de Tokens e Types e TTR",
         xaxis_title="Nota",
         yaxis_title="Quantidade",
         barmode='group',  # Grouped bars
@@ -302,7 +286,7 @@ with st.container():
         font=dict(color="white"),  # White font for titles, labels, and text
         xaxis=dict(
             showgrid=False,  # Remove vertical gridlines
-            color="white"    # White font for x-axis labels
+            color="white"  # White font for x-axis labels
         ),
         yaxis=dict(
             #showgrid=False,  # Remove horizontal gridlines
@@ -310,7 +294,7 @@ with st.container():
         ),
         hoverlabel=dict(
             bgcolor="#FFFFFF",  # Light red background for tooltip
-            font_size=14,       # Tooltip font size           TROQUEI TAMANHO DA FONTE AQUI
+            font_size=14,  # Tooltip font size
             font_color="black"  # Tooltip text color
         )
 
@@ -322,19 +306,19 @@ with st.container():
 
 with st.container():
     st.markdown( """---""" )
-    st.subheader( 'Número de Tokens e Types de Cada Texto Segundo Cada Nota' )
+    st.subheader( 'Distribuição de Types e Tokens por Notas' )
 
     # Create the scatterplot
     fig = px.scatter(
         filtered_df_va,
-        x='token_count',                # x-axis: total tokens
-        y='types_count',                # y-axis: unique tokens
-        color='nota',                   # Color the dots based on the 'nota' column
-        hover_data=['token_count', 'types_count', 'nota'],  # Tooltip includes 'nota' #title="Quantidade de Tokens e Types segundo Nota", TA APARECENDO UNDEFINED... COMO TIRAAAAR
+        x='token_count',  # x-axis: total tokens
+        y='types_count',    # y-axis: unique tokens
+        color='grade',   # Color the dots based on the 'grade' column
+        hover_data=['token_count', 'types_count', 'grade'],  # Tooltip includes 'grade' #title="Quantidade de Tokens e Types segundo Nota"
         labels={
             'token_count': 'Tokens',
             'types_count': 'Types',
-            'nota': 'Nota'
+            'grade': 'Nota'
         },
         color_continuous_scale='Agsunset' 
     )
@@ -342,23 +326,23 @@ with st.container():
     # Customize layout
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-        plot_bgcolor='rgba(0,0,0,0)',   # Transparent plot area
-        font=dict(color='white'),       # White font for titles, labels, and text
-        #title_font=dict(size=18),       # Title font size
-        xaxis_title_font=dict(size=16), # X-axis label font size            TROQUEI TAMANHO DA FONTE AQUI
-        yaxis_title_font=dict(size=16), # Y-axis label font size               TROQUEI TAMANHO DA FONTE AQUI
+        plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot area
+        font=dict(color='white'),   # White font for titles, labels, and text
+        #title_font=dict(size=18), 
+        xaxis_title_font=dict(size=16), # X-axis label font size
+        yaxis_title_font=dict(size=16), # Y-axis label font size
     )
 
     # Customize tooltip
     fig.update_traces(
         hoverlabel=dict(
-            bgcolor='white',            # White background for tooltip
-            font_size=14,               # Font size for tooltip text        TROQUEI TAMANHO DA FONTE AQUI
-            font_color='black'          # Black font color
+            bgcolor='white', # White background for tooltip
+            font_size=14,  # Font size for tooltip text
+            font_color='black' # Black font color
         )
     )
 
     # Show the figure
     fig.show()
-    st.plotly_chart( fig, use_container_width = True ) # use_container_width = True pra usar toda largura disponível
+    st.plotly_chart( fig, use_container_width = True )
 
