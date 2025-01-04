@@ -198,7 +198,7 @@ with st.container():
 
 
     #fig.update_yaxes(title="Tokens", tickfont=dict(size=14), automargin=True)
-    fig.update_yaxes(title="Tokens", showticklabels=False) # showticklabels=False to show the words just in tooltip
+    fig.update_yaxes(title="", showticklabels=False) # showticklabels=False to show the words just in tooltip
     fig.update_xaxes(title="", showticklabels=False)
 
     # Show the figure
@@ -237,13 +237,7 @@ with st.container():
         width=1000,   # Keep width consistent
     )
 
-    # Update y-axis to hide tokens
-    fig.update_yaxes(
-        title="",  # No y-axis title
-        showticklabels=False,  # Hide tokens from y-axis
-    )
-
-    # Update x-axis for better styling
+    fig.update_yaxes(title="", showticklabels=False)
     fig.update_xaxes(title="", showticklabels=False)
 
     # Show the figure
