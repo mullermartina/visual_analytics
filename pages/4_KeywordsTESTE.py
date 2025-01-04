@@ -26,7 +26,7 @@ df_va = df.copy()
 # ==================================================================
 # Pré-Processamento
 # ==================================================================
-df_va.groupby('nota').count()
+df_va.groupby('grade').count()
 
 nltk.download('stopwords')
 nltk.download('punkt') # Tokenizer, important to nltk.word_tokenize
@@ -44,7 +44,6 @@ def clean_cp(text):
 df_va['content'] = df_va['content'].apply(clean_cp)
 
 # Tokenizing removing stopwords: important to token frequency
-
 def tokenized_cp(text):
    stopwords = nltk.corpus.stopwords.words('portuguese') # Loading the Portuguese stopwords
    tokenized = nltk.word_tokenize(text, language='portuguese') #Tokenizing
@@ -64,22 +63,22 @@ df_va['tokenized_content'] = df_va['content'].apply(tokenized_cp)
 df_va['num_tokens'] = df_va['tokenized_content'].apply(len)
 
 # Group by grade
-qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
+qty_tokens_grade = df_va.groupby('grade')['num_tokens'].sum()
 
-nota_token_counts = (
-    df_va.groupby('nota')['tokenized_content']
+grade_token_count = (
+    df_va.groupby('grade')['tokenized_content']
     .apply(lambda texts: Counter([token for text in texts for token in text]))
 )
 
 # Create dataframe to visualization
-df_frequency = nota_token_counts.reset_index()
-df_frequency.columns = ['nota', 'token', 'token_frequency']
+df_frequency = grade_token_count.reset_index()
+df_frequency.columns = ['grade', 'token', 'token_frequency']
 sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
 
 df_words = pd.DataFrame()
 
 top_tokens_per_grade = (
-    sorted_tokens.groupby('nota')
+    sorted_tokens.groupby('grade')
     .head(100)  # Assim mostra os 100 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
     .reset_index(drop=True)
 )
@@ -112,24 +111,24 @@ df_va['filtered_content'] = df_va['tokenized_content'].apply(
 df_va['num_tokens'] = df_va['filtered_content'].apply(len)
 
 # Group by each grade
-qtde_tokens_nota = df_va.groupby('nota')['num_tokens'].sum()
+qty_tokens_grades = df_va.groupby('grade')['num_tokens'].sum()
 
 # Group token count according to each grade
-nota_token_counts = (
-    df_va.groupby('nota')['filtered_content']
+grade_token_count = (
+    df_va.groupby('grade')['filtered_content']
     .apply(lambda texts: Counter([token for text in texts for token in text]))
 )
 
 # Converting each token and its count into a DataFrame
-df_frequency = nota_token_counts.reset_index()
-df_frequency.columns = ['nota', 'token', 'token_frequency']
+df_frequency = grade_token_count.reset_index()
+df_frequency.columns = ['grade', 'token', 'token_frequency']
 sorted_tokens = df_frequency.sort_values('token_frequency', ascending=False)
 
 df_words_ta = pd.DataFrame()
 
 # Grouping the token count by grade to display the most common ones for each grade
 top_tokens_per_grade = (
-    sorted_tokens.groupby('nota')
+    sorted_tokens.groupby('grade')
     .head(100)  # Assim mostra os 100 tokens mais comuns. Já vai ficar péssimo na visualização entao mantenho esse head e insiro outro abaixo.
     .reset_index(drop=True)
 )
@@ -147,7 +146,7 @@ selected_grades = st.sidebar.multiselect(
 )
 
 # Filter Dataframes based on selected grades
-filtered_df_words = df_words[df_words['nota'].isin(selected_grades)]
+filtered_df_words = df_words[df_words['grade'].isin(selected_grades)]
 
 st.markdown("")
 
@@ -170,7 +169,7 @@ with st.container():
     st.subheader(f'{number} Palavras mais frequentes')
 
     # Pivot the data for heatmap
-    heatmap_data = filtered_df_words.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
+    heatmap_data = filtered_df_words.pivot(index='token', columns='grade', values='token_frequency').fillna(0).head(number)
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
@@ -211,7 +210,7 @@ with st.container():
     st.subheader(f'{number} Palavras Mais Frequentes ao Retirar Tarefa 4')
 
     # Pivot the data for heatmap
-    heatmap_data = df_words_ta.pivot(index='token', columns='nota', values='token_frequency').fillna(0).head(number)
+    heatmap_data = df_words_ta.pivot(index='token', columns='grade', values='token_frequency').fillna(0).head(number)
 
     # Create the heatmap
     fig = go.Figure(data=go.Heatmap(
