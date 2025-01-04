@@ -1,13 +1,13 @@
 import streamlit as st
 
 # ==================================================================
-# Configurações
+# Settings
 # ==================================================================
 st.set_page_config(page_title = 'Home',
                   layout= 'centered')
 
 # ==================================================================
-# Barra Lateral
+# Sidebar
 # ==================================================================
 #st.sidebar.markdown( '# Celpe-Bras 2015/2' ) 
 #st.sidebar.markdown( """---""" )
@@ -27,8 +27,8 @@ st.markdown("""
 """
 )
 
-image_path = "tarefa4.png"
-st.image(image_path, use_column_width=True) # , caption="This is an example PNG image", #, use_column_width=True
+image_path = "task4.png"
+st.image(image_path, use_column_width=True)
 
 st.markdown("""
            Em Tokens e Types você obterá insights acerca do número de tokens e types dos textos de acordo com cada nota.
