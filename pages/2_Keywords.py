@@ -79,7 +79,7 @@ df_words = pd.DataFrame()
 
 top_tokens_per_grade = (
     sorted_tokens.groupby('grade')
-    .head(100)  # Showing just the 100 most commomn
+    .head(100)  # Showing just the 100 most common
     .reset_index(drop=True)
 )
 df_words = top_tokens_per_grade

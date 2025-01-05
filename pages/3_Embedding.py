@@ -64,8 +64,8 @@ model = Word2Vec(
     sentences=tokenized_corpus, # Input tokenized sentences
     vector_size=100, # Dimensionality of the embedding vectors
     window=5, # Context window size
-    min_count=1, # Minimum word frequency
-    sg=0, # CBOW (0) or Skip-gram (1)
+    min_count=5, # Minimum word frequency: at the beginning I did min_count=1 but then I changed to =5 to reduce noise
+    sg=1, # CBOW (0) or Skip-gram (1)
     workers=1, # workers=1 to do a reproducible run
     seed=42 # To do a reproducible run
 )
