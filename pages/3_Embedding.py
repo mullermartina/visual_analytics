@@ -65,7 +65,7 @@ model = Word2Vec(
     vector_size=100, # Dimensionality of the embedding vectors
     window=5, # Context window size
     min_count=5, # Minimum word frequency: at the beginning I did min_count=1 but then I changed to =5 to reduce noise
-    epochs=20, # because the corpus is small, so it's better 
+    epochs=10, # Considering corpus size and time to train 
     sg=1, # CBOW (0) or Skip-gram (1)
     workers=1, # workers=1 to do a reproducible run
     seed=42 # To do a reproducible run
