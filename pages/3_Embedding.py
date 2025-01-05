@@ -65,6 +65,7 @@ model = Word2Vec(
     vector_size=100, # Dimensionality of the embedding vectors
     window=5, # Context window size
     min_count=5, # Minimum word frequency: at the beginning I did min_count=1 but then I changed to =5 to reduce noise
+    epochs=20, # because the corpus is small, so it's better 
     sg=1, # CBOW (0) or Skip-gram (1)
     workers=1, # workers=1 to do a reproducible run
     seed=42 # To do a reproducible run
@@ -79,7 +80,7 @@ with st.container():
     st.markdown("""---""")
     st.subheader('Embedding das Palavras do Corpus')
 
-     # TSNE visualization function
+    # TSNE visualization function
     def visualize_embeddings(model, selected_word=None, num_neighbors=10, num_points=1000):
         words = list(model.wv.index_to_key)[:num_points]  # Limit the number of words to display
         vectors = model.wv[words]
@@ -99,7 +100,7 @@ with st.container():
             neighbor_words = [selected_word] + [word for word, _ in neighbors]
             df_fe['color'] = df_fe['Token'].apply(
                 lambda x: '#FF4B4B' if x == selected_word else 
-                        ('#FF904B' if x in neighbor_words else '#A0A0A0')  # Gray for others
+                        ('#FF904B' if x in neighbor_words else '#A0A0A0')
             )
             df_filtered = df_fe[df_fe['Token'].isin(neighbor_words + [selected_word])]
         else:
