@@ -126,7 +126,7 @@ with st.container():
         fig.update_layout(
             plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
             paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
-            font=dict(color='white'),  # White font for axis labels and title
+            font=dict(color='black'),  # White font for axis labels and title ERA font=dict(color='white')
             hoverlabel=dict(
                 bgcolor='white',  # White background for tooltips
                 font_size=14,  # Tooltip font size

@@ -153,7 +153,7 @@ with st.container():
         template="plotly_white",
         plot_bgcolor="rgba(0, 0, 0, 0)",  # Transparent plot background
         paper_bgcolor="rgba(0, 0, 0, 0)",  # Transparent outer background
-        font=dict(color="white"),  # White font for titles, labels, and text
+        font=dict(color="white"),  
         xaxis=dict(
         showgrid=False,  # Remove vertical gridlines
         color="white"  # White font for x-axis labels
