@@ -68,7 +68,7 @@ model = Word2Vec(
     sg=1, # CBOW (0) or Skip-gram (1)
     workers=1, # workers=1 to do a reproducible run
     seed=42 # To do a reproducible run
-)
+) # Default in Gensim: epochs=5
 
 # ==================================================================
 # Layout no Streamlit
@@ -126,7 +126,7 @@ with st.container():
         fig.update_layout(
             plot_bgcolor='rgba(0, 0, 0, 0)',  # Transparent plot background
             paper_bgcolor='rgba(0, 0, 0, 0)',  # Transparent outer background
-            font=dict(color='black'),  # White font for axis labels and title ERA font=dict(color='white')
+            font=dict(color='white'),  # White font for axis labels and title
             hoverlabel=dict(
                 bgcolor='white',  # White background for tooltips
                 font_size=14,  # Tooltip font size
